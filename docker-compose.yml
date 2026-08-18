@@ -12,19 +12,13 @@ services:
       - "3001:3001"
     volumes:
       - ./api:/ai-interview
+    env_file:
+      - ./api/.env
     environment:
       - RAILS_ENV=development
-      - SECRET_KEY_BASE=rakamin_dev_secret_key_base_123456789012345678901234567890
-      - DATABASE_URL=postgresql://postgres:postgrespw123@host.docker.internal:5432/rakamin_development
-      - REDIS_URI=redis://:redispw123@host.docker.internal:6379/0
-      - GEMINI_API_KEY=dummy_key_or_replace_with_real
-      - GEMINI_LIVE_MODEL=gemini-2.0-flash-live-001
-      - GEMINI_FLASH_MODEL=gemini-2.0-flash-001
-      - GEMINI_PRO_MODEL=gemini-2.0-pro-001
-      - FRONTEND_URL=http://localhost:5173
-      - APP_BASE_URL=http://localhost:3001
-      - ALLOWED_ORIGINS=*
-      - TOKEN_EXPIRATION_TIME=259200
+      # Use host.docker.internal for container-to-host bridge routing if localhost is used
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgrespw123@host.docker.internal:5432/rakamin_development}
+      - REDIS_URI=${REDIS_URI:-redis://:redispw123@host.docker.internal:6379/0}
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -34,17 +28,12 @@ services:
     command: bundle exec sidekiq -r ./config/environment.rb -C config/sidekiq.yml
     volumes:
       - ./api:/ai-interview
+    env_file:
+      - ./api/.env
     environment:
       - RAILS_ENV=development
-      - SECRET_KEY_BASE=rakamin_dev_secret_key_base_123456789012345678901234567890
-      - DATABASE_URL=postgresql://postgres:postgrespw123@host.docker.internal:5432/rakamin_development
-      - REDIS_URI=redis://:redispw123@host.docker.internal:6379/0
-      - GEMINI_API_KEY=dummy_key_or_replace_with_real
-      - GEMINI_LIVE_MODEL=gemini-2.0-flash-live-001
-      - GEMINI_FLASH_MODEL=gemini-2.0-flash-001
-      - GEMINI_PRO_MODEL=gemini-2.0-pro-001
-      - APP_BASE_URL=http://localhost:3001
-      - ALLOWED_ORIGINS=*
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgrespw123@host.docker.internal:5432/rakamin_development}
+      - REDIS_URI=${REDIS_URI:-redis://:redispw123@host.docker.internal:6379/0}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
