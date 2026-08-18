@@ -7,18 +7,18 @@ export default function CandidateLayout() {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-200">
       {/* Candidate Focused Header */}
-      <header className="border-b border-border/80 bg-card/85 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+      <header className="border-b border-border/80 bg-card/90 backdrop-blur-md sticky top-0 z-40 shadow-sm">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <RakaminLogo size="sm" subtitle="Candidate Assessment Room" />
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/50 px-2.5 py-1 rounded-full border border-border/50">
-              <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
-              <span>Privasi Terlindungi (UU PDP)</span>
+            <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/40 px-3 py-1.5 rounded-xl border border-border/60">
+              <ShieldCheck className="h-4 w-4 text-emerald-500" />
+              <span className="font-medium">Privasi Terlindungi (UU PDP)</span>
             </div>
-            <ThemeToggle variant="segmented" />
+            <ThemeToggle variant="button" />
           </div>
         </div>
       </header>

@@ -1,72 +1,46 @@
 import React from "react";
 import { useAtom } from "jotai";
 import { themeAtom, type Theme } from "@/stores/themeAtom";
-import { Sun, Moon, Laptop } from "lucide-react";
+import { Sun, Moon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface ThemeToggleProps {
   className?: string;
-  variant?: "segmented" | "button";
+  variant?: "button" | "segmented";
 }
 
-export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className, variant = "segmented" }) => {
+export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className, variant = "button" }) => {
   const [theme, setTheme] = useAtom(themeAtom);
 
-  const options: { value: Theme; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-    { value: "light", label: "Light", icon: Sun },
-    { value: "dark", label: "Dark", icon: Moon },
-    { value: "system", label: "System", icon: Laptop },
-  ];
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" &&
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
 
-  if (variant === "button") {
-    const current = options.find((o) => o.value === theme) || options[0];
-    const CurrentIcon = current.icon;
-    const nextTheme: Theme = theme === "light" ? "dark" : theme === "dark" ? "system" : "light";
-
-    return (
-      <button
-        onClick={() => setTheme(nextTheme)}
-        className={cn(
-          "p-2 rounded-xl border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-all shadow-sm active:scale-95",
-          className
-        )}
-        title={`Current: ${current.label}. Click to toggle.`}
-        aria-label="Toggle theme"
-      >
-        <CurrentIcon className="h-4 w-4" />
-      </button>
-    );
-  }
+  const toggleTheme = () => {
+    setTheme(isDark ? "light" : "dark");
+  };
 
   return (
-    <div
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={toggleTheme}
       className={cn(
-        "inline-flex items-center p-1 rounded-xl bg-muted/60 border border-border/80 shadow-inner",
+        "h-9 w-9 rounded-xl border border-border/80 bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-all shadow-sm active:scale-95",
         className
       )}
-      role="group"
-      aria-label="Theme selector"
+      title={isDark ? "Beralih ke Mode Terang (Light Mode)" : "Beralih ke Mode Gelap (Dark Mode)"}
+      aria-label="Toggle theme"
     >
-      {options.map(({ value, label, icon: Icon }) => {
-        const isActive = theme === value;
-        return (
-          <button
-            key={value}
-            onClick={() => setTheme(value)}
-            className={cn(
-              "relative flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer select-none",
-              isActive
-                ? "bg-card text-foreground shadow-sm font-semibold border border-border/50"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
-            )}
-            aria-pressed={isActive}
-          >
-            <Icon className={cn("h-3.5 w-3.5", isActive ? "text-primary" : "text-muted-foreground")} />
-            <span className="hidden sm:inline">{label}</span>
-          </button>
-        );
-      })}
-    </div>
+      {isDark ? (
+        <Moon className="h-4 w-4 text-amber-400" />
+      ) : (
+        <Sun className="h-4 w-4 text-amber-500" />
+      )}
+    </Button>
   );
 };
 
