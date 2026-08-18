@@ -95,46 +95,46 @@ export default function FitGapReportPage() {
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto space-y-6 py-8">
-        <Skeleton className="h-10 w-64 bg-slate-800" />
-        <Skeleton className="h-48 w-full bg-slate-800 rounded-2xl" />
-        <Skeleton className="h-48 w-full bg-slate-800 rounded-2xl" />
+      <div className="max-w-4xl mx-auto space-y-6 py-8">
+        <Skeleton className="h-10 w-64 rounded-xl" />
+        <Skeleton className="h-48 w-full rounded-2xl" />
+        <Skeleton className="h-48 w-full rounded-2xl" />
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 py-6">
+    <div className="max-w-4xl mx-auto space-y-8 py-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-slate-900/70 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 bg-card border border-border/80 rounded-2xl shadow-sm">
         <div className="flex items-center gap-3">
           <Link
             to={`/assessments/${id}/sessions/${sessionId}/portfolio`}
-            className="p-2 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
+            className="p-2.5 rounded-xl bg-muted/60 border border-border/60 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold tracking-tight text-white">Laporan Kesesuaian Lowongan</h1>
-              <span className="px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold">
-                Fit/Gap Report
+              <h1 className="text-xl font-bold tracking-tight text-foreground">Laporan Kesesuaian Lowongan</h1>
+              <span className="px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold">
+                Fit/Gap Intelligence
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">Membandingkan portofolio kandidat terhadap kualifikasi posisi lowongan.</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Membandingkan portofolio kandidat terhadap kualifikasi posisi lowongan.</p>
           </div>
         </div>
 
         {portfolio && (
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={handleRegenerate}
               disabled={regenerating || generating}
-              className="border-slate-700 bg-slate-800/60 rounded-xl text-xs text-slate-200 hover:bg-slate-700"
+              className="border-border/80 bg-muted/40 rounded-xl text-xs text-foreground hover:bg-muted font-semibold"
             >
-              {regenerating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5 mr-1" />}
+              {regenerating ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <RefreshCw className="h-3.5 w-3.5 mr-1 text-primary" />}
               Analisis Ulang
             </Button>
             {report && (
@@ -144,9 +144,9 @@ export default function FitGapReportPage() {
                   size="sm"
                   onClick={() => handleExport("pdf")}
                   disabled={!!exporting}
-                  className="border-slate-700 bg-slate-800/60 rounded-xl text-xs text-slate-200 hover:bg-slate-700"
+                  className="border-border/80 bg-muted/40 rounded-xl text-xs text-foreground hover:bg-muted font-semibold"
                 >
-                  {exporting === "pdf" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5 mr-1" />}
+                  {exporting === "pdf" ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Download className="h-3.5 w-3.5 mr-1 text-primary" />}
                   PDF
                 </Button>
                 <Button
@@ -154,9 +154,9 @@ export default function FitGapReportPage() {
                   size="sm"
                   onClick={() => handleExport("json")}
                   disabled={!!exporting}
-                  className="border-slate-700 bg-slate-800/60 rounded-xl text-xs text-slate-200 hover:bg-slate-700"
+                  className="border-border/80 bg-muted/40 rounded-xl text-xs text-foreground hover:bg-muted font-semibold"
                 >
-                  {exporting === "json" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5 mr-1" />}
+                  {exporting === "json" ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Download className="h-3.5 w-3.5 mr-1 text-primary" />}
                   JSON
                 </Button>
               </>
@@ -167,14 +167,14 @@ export default function FitGapReportPage() {
 
       {/* Generating state */}
       {generating && (
-        <div className="border border-slate-800 bg-slate-900/60 backdrop-blur-xl rounded-3xl p-12 text-center space-y-4 shadow-2xl">
-          <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center mx-auto">
+        <div className="border border-border/80 bg-card rounded-3xl p-12 text-center space-y-4 shadow-sm">
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center mx-auto">
             <Loader2 className="h-6 w-6 animate-spin" />
           </div>
           <div>
-            <p className="text-base font-semibold text-white">Menghasilkan Laporan Fit/Gap...</p>
-            <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto leading-relaxed">
-              Mesin analisis sedang mencocokkan level kompetensi dan mensintesis narasi budaya kerja.
+            <p className="text-base font-bold text-foreground">Menghasilkan Laporan Fit/Gap...</p>
+            <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto leading-relaxed">
+              Mesin analisis sedang mencocokkan level kompetensi, menghitung delta gap, dan mensintesis narasi budaya kerja.
             </p>
           </div>
         </div>
@@ -186,39 +186,39 @@ export default function FitGapReportPage() {
           {/* Skill comparison matrix */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <Building2 className="h-4 w-4 text-cyan-400" />
-              <h2 className="text-sm font-bold text-white tracking-wide uppercase">Matriks Perbandingan Kompetensi</h2>
+              <Building2 className="h-4 w-4 text-primary" />
+              <h2 className="text-sm font-bold text-foreground tracking-wide uppercase">Matriks Perbandingan Kompetensi</h2>
             </div>
             <ComparisonTable comparisons={report.skill_comparisons} />
           </div>
 
-          <Separator className="bg-slate-800" />
+          <Separator />
 
           {/* Culture & competency narrative */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card className="border-slate-800 bg-slate-900/60 backdrop-blur-md rounded-2xl shadow-lg">
+            <Card className="border border-border/80 bg-card rounded-2xl shadow-sm">
               <CardHeader className="pb-2.5">
-                <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-amber-400" />
+                <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-amber-500" />
                   Kesesuaian Budaya &amp; Cara Kerja
                 </CardTitle>
               </CardHeader>
               <CardContent className="px-5 pb-5">
-                <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-wrap bg-slate-950/40 p-3.5 rounded-xl border border-slate-800">
+                <p className="text-xs text-foreground/90 leading-relaxed whitespace-pre-wrap bg-muted/40 p-3.5 rounded-xl border border-border/60">
                   {report.culture_narrative || "Narasi kesesuaian budaya belum tersedia."}
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="border-slate-800 bg-slate-900/60 backdrop-blur-md rounded-2xl shadow-lg">
+            <Card className="border border-border/80 bg-card rounded-2xl shadow-sm">
               <CardHeader className="pb-2.5">
-                <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
-                  <UserCheck2 className="h-4 w-4 text-emerald-400" />
+                <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
+                  <UserCheck2 className="h-4 w-4 text-emerald-500" />
                   Rekomendasi Eksekutif
                 </CardTitle>
               </CardHeader>
               <CardContent className="px-5 pb-5">
-                <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-wrap bg-slate-950/40 p-3.5 rounded-xl border border-slate-800">
+                <p className="text-xs text-foreground/90 leading-relaxed whitespace-pre-wrap bg-muted/40 p-3.5 rounded-xl border border-border/60">
                   {report.overall_narrative || "Rekomendasi keseluruhan belum tersedia."}
                 </p>
               </CardContent>
@@ -228,11 +228,11 @@ export default function FitGapReportPage() {
           {/* Discovered skills */}
           {portfolio && portfolio.skills.some((s) => s.is_discovered) && (
             <>
-              <Separator className="bg-slate-800" />
-              <Card className="border-slate-800 bg-slate-900/40 rounded-2xl">
+              <Separator />
+              <Card className="border border-border/80 bg-card rounded-2xl shadow-sm">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-bold text-white flex items-center gap-1.5">
-                    <Zap className="h-4 w-4 text-amber-400" />
+                  <CardTitle className="text-sm font-bold text-foreground flex items-center gap-1.5">
+                    <Zap className="h-4 w-4 text-amber-500" />
                     Keahlian Tambahan yang Terdeteksi
                   </CardTitle>
                 </CardHeader>
@@ -240,14 +240,14 @@ export default function FitGapReportPage() {
                   {portfolio.skills
                     .filter((s) => s.is_discovered)
                     .map((s) => (
-                      <div key={s.id} className="text-xs flex items-center justify-between p-3 rounded-xl bg-slate-800/40 border border-slate-800">
+                      <div key={s.id} className="text-xs flex items-center justify-between p-3 rounded-xl bg-muted/40 border border-border/60">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-white">{s.skill_label}</span>
-                          <span className="px-2 py-0.5 rounded-full bg-slate-700 text-slate-300 text-[10px]">
+                          <span className="font-semibold text-foreground">{s.skill_label}</span>
+                          <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-[10px] font-bold">
                             {s.ai_level || "Unassessed"}
                           </span>
                         </div>
-                        <span className="text-[11px] text-slate-400">Nilai tambah di luar kualifikasi posisi</span>
+                        <span className="text-[11px] text-muted-foreground">Nilai tambah di luar kualifikasi posisi</span>
                       </div>
                     ))}
                 </CardContent>

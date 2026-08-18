@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SkillPortfolioCard from "@/components/portfolio/SkillPortfolioCard";
@@ -101,7 +100,7 @@ export default function PortfolioPage() {
     const highConfidence = portfolio.skills.filter((s) => s.ai_confidence?.toLowerCase() === "high");
     const avgScore = assessed.length > 0
       ? (assessed.reduce((acc, s) => acc + (Number(s.ai_level) || 0), 0) / assessed.length).toFixed(1)
-      : "—";
+      : "-";
 
     return {
       total: portfolio.skills.length,
@@ -113,56 +112,58 @@ export default function PortfolioPage() {
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto space-y-6 py-8">
-        <Skeleton className="h-10 w-64 bg-slate-800" />
-        <Skeleton className="h-32 w-full bg-slate-800 rounded-2xl" />
-        <Skeleton className="h-48 w-full bg-slate-800 rounded-2xl" />
+      <div className="max-w-4xl mx-auto space-y-6 py-8">
+        <Skeleton className="h-10 w-64 rounded-xl" />
+        <Skeleton className="h-32 w-full rounded-2xl" />
+        <Skeleton className="h-48 w-full rounded-2xl" />
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 py-6">
+    <div className="max-w-4xl mx-auto space-y-8 py-4">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-slate-900/70 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 bg-card border border-border/80 rounded-2xl shadow-sm">
         <div className="flex items-center gap-3">
           <Link
             to={`/assessments/${id}/invite`}
-            className="p-2 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
+            className="p-2.5 rounded-xl bg-muted/60 border border-border/60 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold tracking-tight text-white">Portofolio Kompetensi Kandidat</h1>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
+              <h1 className="text-xl font-bold tracking-tight text-foreground">Portofolio Kompetensi Kandidat</h1>
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold">
                 Verified
               </span>
             </div>
             {candidateName && (
-              <p className="text-xs text-slate-400 mt-0.5">Kandidat: <strong className="text-slate-200 font-medium">{candidateName}</strong></p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Kandidat: <strong className="text-foreground font-semibold">{candidateName}</strong>
+              </p>
             )}
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Link
             to={`/assessments/${id}/sessions/${sessionId}/transcript`}
-            className="inline-flex items-center gap-1.5 text-xs font-medium border border-slate-700 bg-slate-800/60 rounded-xl px-3.5 py-2 hover:bg-slate-700 text-slate-200 transition-colors shadow-sm"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold border border-border/80 bg-muted/40 rounded-xl px-3.5 py-2 hover:bg-muted text-foreground transition-colors shadow-sm"
           >
-            <FileText className="h-3.5 w-3.5 text-blue-400" />
+            <FileText className="h-3.5 w-3.5 text-primary" />
             Transkrip Sesi
           </Link>
-          {!generating && portfolio && (
+          {!generating && portfolio && portfolio.generation_status === "complete" && (
             <>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleExport("pdf")}
                 disabled={!!exporting}
-                className="border-slate-700 bg-slate-800/60 rounded-xl text-xs text-slate-200 hover:bg-slate-700"
+                className="border-border/80 bg-muted/40 rounded-xl text-xs text-foreground hover:bg-muted font-semibold"
               >
-                {exporting === "pdf" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5 mr-1" />}
+                {exporting === "pdf" ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Download className="h-3.5 w-3.5 mr-1 text-primary" />}
                 PDF
               </Button>
               <Button
@@ -170,9 +171,9 @@ export default function PortfolioPage() {
                 size="sm"
                 onClick={() => handleExport("json")}
                 disabled={!!exporting}
-                className="border-slate-700 bg-slate-800/60 rounded-xl text-xs text-slate-200 hover:bg-slate-700"
+                className="border-border/80 bg-muted/40 rounded-xl text-xs text-foreground hover:bg-muted font-semibold"
               >
-                {exporting === "json" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5 mr-1" />}
+                {exporting === "json" ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Download className="h-3.5 w-3.5 mr-1 text-primary" />}
                 JSON
               </Button>
             </>
@@ -182,14 +183,14 @@ export default function PortfolioPage() {
 
       {/* Generating state */}
       {generating && (
-        <div className="border border-slate-800 bg-slate-900/60 backdrop-blur-xl rounded-3xl p-12 text-center space-y-4 shadow-2xl">
-          <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center mx-auto">
+        <div className="border border-border/80 bg-card rounded-3xl p-12 text-center space-y-4 shadow-sm">
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center mx-auto">
             <Loader2 className="h-6 w-6 animate-spin" />
           </div>
           <div>
-            <p className="text-base font-semibold text-white">Memproses Evaluasi Portofolio AI...</p>
-            <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto leading-relaxed">
-              Model AI sedang menganalisis transkrip wawancara dan mengekstrak bukti keahlian.
+            <p className="text-base font-bold text-foreground">Memproses Evaluasi Portofolio AI...</p>
+            <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto leading-relaxed">
+              Model AI sedang menganalisis transkrip wawancara, mencocokkan anchor perilaku L1-L5, dan mengekstrak bukti keahlian kandidat.
             </p>
           </div>
         </div>
@@ -197,9 +198,9 @@ export default function PortfolioPage() {
 
       {/* Failed state */}
       {!generating && portfolio?.generation_status === "failed" && (
-        <div className="border border-red-500/30 bg-red-950/30 rounded-3xl p-8 text-center space-y-3 shadow-xl">
-          <p className="text-sm font-semibold text-red-300">Generasi Portofolio Gagal</p>
-          <p className="text-xs text-slate-400 max-w-md mx-auto">{portfolio.generation_error || "Terjadi kesalahan saat memproses evaluasi LLM."}</p>
+        <div className="border border-destructive/30 bg-destructive/10 rounded-3xl p-8 text-center space-y-3 shadow-sm">
+          <p className="text-sm font-bold text-destructive">Generasi Portofolio Gagal</p>
+          <p className="text-xs text-muted-foreground max-w-md mx-auto">{portfolio.generation_error || "Terjadi kesalahan saat memproses evaluasi LLM."}</p>
           <Button
             variant="outline"
             size="sm"
@@ -207,7 +208,7 @@ export default function PortfolioPage() {
               await sessionsApi.regeneratePortfolio(Number(sessionId));
               setGenerating(true);
             }}
-            className="mt-2 border-red-500/30 text-red-300 hover:bg-red-500/10 rounded-xl"
+            className="mt-2 border-destructive/30 text-destructive hover:bg-destructive/10 rounded-xl font-semibold"
           >
             <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> Coba Lagi
           </Button>
@@ -219,35 +220,92 @@ export default function PortfolioPage() {
         <>
           {/* Metrics summary cards */}
           {summaryStats && (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-              <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl">
-                <span className="text-[11px] font-medium text-slate-400">Total Keahlian</span>
-                <p className="text-2xl font-bold text-white mt-1">{summaryStats.total}</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="p-4 rounded-2xl bg-card border border-border/80 shadow-sm space-y-1">
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+                  <BarChart3 className="h-3.5 w-3.5 text-primary" />
+                  <span>Total Keahlian</span>
+                </div>
+                <div className="text-2xl font-black text-foreground">{summaryStats.total}</div>
+                <div className="text-[11px] text-muted-foreground">Termasuk keahlian baru</div>
               </div>
-              <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl">
-                <span className="text-[11px] font-medium text-slate-400">Tervalidasi (Assessed)</span>
-                <p className="text-2xl font-bold text-emerald-400 mt-1">{summaryStats.assessedCount}</p>
+
+              <div className="p-4 rounded-2xl bg-card border border-border/80 shadow-sm space-y-1">
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                  <span>Dievaluasi</span>
+                </div>
+                <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
+                  {summaryStats.assessedCount}
+                </div>
+                <div className="text-[11px] text-muted-foreground">{summaryStats.total - summaryStats.assessedCount} belum dievaluasi</div>
               </div>
-              <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl">
-                <span className="text-[11px] font-medium text-slate-400">High Confidence</span>
-                <p className="text-2xl font-bold text-blue-400 mt-1">{summaryStats.highConfidenceCount}</p>
+
+              <div className="p-4 rounded-2xl bg-card border border-border/80 shadow-sm space-y-1">
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+                  <Zap className="h-3.5 w-3.5 text-amber-500" />
+                  <span>High Confidence</span>
+                </div>
+                <div className="text-2xl font-black text-amber-600 dark:text-amber-400">
+                  {summaryStats.highConfidenceCount}
+                </div>
+                <div className="text-[11px] text-muted-foreground">Bukti sangat solid</div>
               </div>
-              <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl">
-                <span className="text-[11px] font-medium text-slate-400">Rata-Rata Level</span>
-                <p className="text-2xl font-bold text-cyan-400 mt-1">L{summaryStats.avgScore}</p>
+
+              <div className="p-4 rounded-2xl bg-card border border-border/80 shadow-sm space-y-1">
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+                  <Award className="h-3.5 w-3.5 text-primary" />
+                  <span>Rata-Rata Level</span>
+                </div>
+                <div className="text-2xl font-black text-primary">
+                  {summaryStats.avgScore}
+                </div>
+                <div className="text-[11px] text-muted-foreground">Skala 1 s/d 5</div>
               </div>
             </div>
           )}
 
-          {/* Configured skills */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Award className="h-4 w-4 text-blue-400" />
-              <h2 className="text-sm font-bold text-white tracking-wide uppercase">Keahlian Utama (Configured Skills)</h2>
+          {/* Fit/Gap matching action banner */}
+          <div className="p-5 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-bold text-foreground">Analisis Kesesuaian Lowongan (Fit/Gap Report)</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Bandingkan profil kompetensi kandidat ini dengan persyaratan posisi yang sedang dibuka.
+              </p>
             </div>
-            <div className="space-y-3.5">
+
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Select value={selectedVacancy} onValueChange={setSelectedVacancy}>
+                <SelectTrigger className="h-9 w-full sm:w-48 bg-card border-border text-xs rounded-xl">
+                  <SelectValue placeholder="Pilih Lowongan..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl border-border bg-card">
+                  {vacancies.map((v) => (
+                    <SelectItem key={v.id} value={String(v.id)} className="text-xs">
+                      {v.role_title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                size="sm"
+                onClick={handleRunFitGap}
+                disabled={!selectedVacancy}
+                className="h-9 px-4 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs whitespace-nowrap shadow-sm"
+              >
+                Jalankan Fit/Gap
+              </Button>
+            </div>
+          </div>
+
+          {/* Configured skills section */}
+          <div className="space-y-4">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+              Keahlian Utama ({portfolio.skills?.filter((s) => !s.is_discovered).length ?? 0})
+            </h2>
+            <div className="space-y-3">
               {portfolio.skills
-                .filter((s) => !s.is_discovered)
+                ?.filter((s) => !s.is_discovered)
                 .map((skill) => (
                   <SkillPortfolioCard
                     key={skill.id}
@@ -259,66 +317,27 @@ export default function PortfolioPage() {
             </div>
           </div>
 
-          {/* Discovered skills */}
-          {portfolio.skills.some((s) => s.is_discovered) && (
-            <>
-              <Separator className="bg-slate-800" />
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-amber-400" />
-                  <h2 className="text-sm font-bold text-white tracking-wide uppercase">Keahlian Tambahan (Discovered Skills)</h2>
-                </div>
-                <div className="space-y-3.5">
-                  {portfolio.skills
-                    .filter((s) => s.is_discovered)
-                    .map((skill) => (
-                      <SkillPortfolioCard
-                        key={skill.id}
-                        skill={skill}
-                        override={overrides[skill.id]}
-                        onOverrideSaved={(o) => handleOverrideSaved(skill.id, o)}
-                      />
-                    ))}
-                </div>
-              </div>
-            </>
-          )}
-
-          <Separator className="bg-slate-800" />
-
-          {/* Fit/Gap analysis trigger */}
-          <div className="p-6 bg-gradient-to-r from-blue-950/40 to-slate-900/60 border border-slate-800 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-white font-semibold text-sm">
-                <BarChart3 className="h-4 w-4 text-cyan-400" />
-                <span>Analisis Kesesuaian Lowongan (Fit/Gap Report)</span>
-              </div>
-              <p className="text-xs text-slate-400">
-                Bandingkan profil portofolio ini terhadap kualifikasi lowongan pekerjaan yang dituju.
-              </p>
-            </div>
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              <Select value={selectedVacancy} onValueChange={setSelectedVacancy}>
-                <SelectTrigger className="w-full sm:w-60 bg-slate-800/80 border-slate-700 rounded-xl text-xs text-white">
-                  <SelectValue placeholder="Pilih lowongan..." />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-900 border-slate-800 text-white">
-                  {vacancies.map((v) => (
-                    <SelectItem key={v.id} value={String(v.id)} className="text-xs focus:bg-slate-800">
-                      {v.role_title}
-                    </SelectItem>
+          {/* Discovered skills section */}
+          {portfolio.skills?.some((s) => s.is_discovered) && (
+            <div className="space-y-4 pt-4">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                <Zap className="h-4 w-4" />
+                Keahlian Tambahan yang Ditemukan ({portfolio.skills.filter((s) => s.is_discovered).length})
+              </h2>
+              <div className="space-y-3">
+                {portfolio.skills
+                  ?.filter((s) => s.is_discovered)
+                  .map((skill) => (
+                    <SkillPortfolioCard
+                      key={skill.id}
+                      skill={skill}
+                      override={overrides[skill.id]}
+                      onOverrideSaved={(o) => handleOverrideSaved(skill.id, o)}
+                    />
                   ))}
-                </SelectContent>
-              </Select>
-              <Button
-                onClick={handleRunFitGap}
-                disabled={!selectedVacancy}
-                className="bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs whitespace-nowrap shadow-lg shadow-blue-600/20"
-              >
-                Jalankan Analisis →
-              </Button>
+              </div>
             </div>
-          </div>
+          )}
         </>
       )}
     </div>
