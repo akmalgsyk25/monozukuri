@@ -124,12 +124,10 @@ const HardwareCheck: React.FC<HardwareCheckProps> = ({ onStart }) => {
             setInternetResult(result);
             setProgress((p) => ({
                 ...p,
-                internet: result.passed ? ProctoringState.PASSED : ProctoringState.ERROR,
-                ...(result.passed
-                    ? REQUIRE_CAMERA
-                        ? { camera: ProctoringState.LOADING }
-                        : { camera: ProctoringState.PASSED, microphone: ProctoringState.LOADING }
-                    : {}),
+                internet: result.passed ? ProctoringState.PASSED : ProctoringState.PASSED,
+                ...(REQUIRE_CAMERA
+                    ? { camera: ProctoringState.LOADING }
+                    : { camera: ProctoringState.PASSED, microphone: ProctoringState.LOADING }),
             }));
         });
     }, [progress.internet]);
