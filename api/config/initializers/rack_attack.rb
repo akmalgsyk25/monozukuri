@@ -2,8 +2,9 @@
 
 class Rack::Attack
   # Use Redis for distributed throttle state across pods.
+  redis_url = ENV['REDIS_URI'].presence || ENV.fetch('REDIS_URL', 'redis://:redispw123@localhost:6379/0')
   Rack::Attack.cache.store = ActiveSupport::Cache::RedisCacheStore.new(
-    url: ENV.fetch('REDIS_URL', 'redis://localhost:6379/1')
+    url: redis_url
   )
 
   # Throttle login attempts: 5 per minute per IP.
