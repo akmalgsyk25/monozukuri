@@ -26,8 +26,8 @@ class Session < ApplicationRecord
   def pending? = status == 'pending'
 
   def invite_url
-    base = ENV.fetch('APP_BASE_URL', 'http://localhost:3001')
-    "#{base}/interview/#{invite_token}"
+    frontend_base = ENV['FRONTEND_URL'].presence || ENV['APP_FRONTEND_URL'].presence || 'http://localhost:5173'
+    "#{frontend_base}/interview/#{invite_token}"
   end
 
   private
