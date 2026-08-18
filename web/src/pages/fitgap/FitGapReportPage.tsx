@@ -8,7 +8,7 @@ import ComparisonTable from "@/components/fitgap/ComparisonTable";
 import { portfoliosApi } from "@/services/portfolios";
 import { sessionsApi } from "@/services/sessions";
 import { usePolling } from "@/hooks/usePolling";
-import { ArrowLeft, Download, Loader2, RefreshCw, Zap } from "lucide-react";
+import { ArrowLeft, Download, Loader2, RefreshCw, Zap, Sparkles, Building2, UserCheck2 } from "lucide-react";
 import type { FitGapReport, Portfolio } from "@/types";
 
 export default function FitGapReportPage() {
@@ -95,42 +95,67 @@ export default function FitGapReportPage() {
 
   if (loading) {
     return (
-      <div className="max-w-2xl mx-auto space-y-4">
-        <Skeleton className="h-8 w-64" />
-        <Skeleton className="h-48 w-full" />
+      <div className="max-w-3xl mx-auto space-y-6 py-8">
+        <Skeleton className="h-10 w-64 bg-slate-800" />
+        <Skeleton className="h-48 w-full bg-slate-800 rounded-2xl" />
+        <Skeleton className="h-48 w-full bg-slate-800 rounded-2xl" />
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-8 py-6">
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <Link
-              to={`/assessments/${id}/sessions/${sessionId}/portfolio`}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-            <h1 className="text-lg font-semibold">Fit/Gap Report</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-slate-900/70 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl">
+        <div className="flex items-center gap-3">
+          <Link
+            to={`/assessments/${id}/sessions/${sessionId}/portfolio`}
+            className="p-2 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-bold tracking-tight text-white">Laporan Kesesuaian Lowongan</h1>
+              <span className="px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold">
+                Fit/Gap Report
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 mt-0.5">Membandingkan portofolio kandidat terhadap kualifikasi posisi lowongan.</p>
           </div>
         </div>
 
         {portfolio && (
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={handleRegenerate} disabled={regenerating || generating}>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRegenerate}
+              disabled={regenerating || generating}
+              className="border-slate-700 bg-slate-800/60 rounded-xl text-xs text-slate-200 hover:bg-slate-700"
+            >
               {regenerating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5 mr-1" />}
-              Regenerate
+              Analisis Ulang
             </Button>
             {report && (
               <>
-                <Button variant="outline" size="sm" onClick={() => handleExport("pdf")} disabled={!!exporting}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleExport("pdf")}
+                  disabled={!!exporting}
+                  className="border-slate-700 bg-slate-800/60 rounded-xl text-xs text-slate-200 hover:bg-slate-700"
+                >
                   {exporting === "pdf" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5 mr-1" />}
                   PDF
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => handleExport("json")} disabled={!!exporting}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleExport("json")}
+                  disabled={!!exporting}
+                  className="border-slate-700 bg-slate-800/60 rounded-xl text-xs text-slate-200 hover:bg-slate-700"
+                >
                   {exporting === "json" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5 mr-1" />}
                   JSON
                 </Button>
@@ -140,62 +165,89 @@ export default function FitGapReportPage() {
         )}
       </div>
 
-      {/* Generating */}
+      {/* Generating state */}
       {generating && (
-        <div className="border rounded-lg p-12 text-center space-y-3">
-          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-          <p className="text-sm text-muted-foreground">Generating fit/gap report...</p>
+        <div className="border border-slate-800 bg-slate-900/60 backdrop-blur-xl rounded-3xl p-12 text-center space-y-4 shadow-2xl">
+          <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center mx-auto">
+            <Loader2 className="h-6 w-6 animate-spin" />
+          </div>
+          <div>
+            <p className="text-base font-semibold text-white">Menghasilkan Laporan Fit/Gap...</p>
+            <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto leading-relaxed">
+              Mesin analisis sedang mencocokkan level kompetensi dan mensintesis narasi budaya kerja.
+            </p>
+          </div>
         </div>
       )}
 
       {/* Report ready */}
       {report && (
         <>
-          {/* Skill comparison */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm">Skill Comparison</CardTitle>
-            </CardHeader>
-            <CardContent className="px-4 pb-4">
-              <ComparisonTable comparisons={report.skill_comparisons} />
-            </CardContent>
-          </Card>
+          {/* Skill comparison matrix */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Building2 className="h-4 w-4 text-cyan-400" />
+              <h2 className="text-sm font-bold text-white tracking-wide uppercase">Matriks Perbandingan Kompetensi</h2>
+            </div>
+            <ComparisonTable comparisons={report.skill_comparisons} />
+          </div>
 
-          <Separator />
+          <Separator className="bg-slate-800" />
 
-          {/* Culture & competency */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm">Culture &amp; Competency Fit</CardTitle>
-            </CardHeader>
-            <CardContent className="px-4 pb-4">
-              <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">
-                {report.culture_narrative || report.overall_narrative}
-              </p>
-            </CardContent>
-          </Card>
+          {/* Culture & competency narrative */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card className="border-slate-800 bg-slate-900/60 backdrop-blur-md rounded-2xl shadow-lg">
+              <CardHeader className="pb-2.5">
+                <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-amber-400" />
+                  Kesesuaian Budaya &amp; Cara Kerja
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-5 pb-5">
+                <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-wrap bg-slate-950/40 p-3.5 rounded-xl border border-slate-800">
+                  {report.culture_narrative || "Narasi kesesuaian budaya belum tersedia."}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-slate-800 bg-slate-900/60 backdrop-blur-md rounded-2xl shadow-lg">
+              <CardHeader className="pb-2.5">
+                <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
+                  <UserCheck2 className="h-4 w-4 text-emerald-400" />
+                  Rekomendasi Eksekutif
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-5 pb-5">
+                <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-wrap bg-slate-950/40 p-3.5 rounded-xl border border-slate-800">
+                  {report.overall_narrative || "Rekomendasi keseluruhan belum tersedia."}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Discovered skills */}
           {portfolio && portfolio.skills.some((s) => s.is_discovered) && (
             <>
-              <Separator />
-              <Card>
+              <Separator className="bg-slate-800" />
+              <Card className="border-slate-800 bg-slate-900/40 rounded-2xl">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm flex items-center gap-1.5">
-                    <Zap className="h-4 w-4 text-amber-500" />
-                    Discovered Skills (not in vacancy requirements)
+                  <CardTitle className="text-sm font-bold text-white flex items-center gap-1.5">
+                    <Zap className="h-4 w-4 text-amber-400" />
+                    Keahlian Tambahan yang Terdeteksi
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="px-4 pb-4 space-y-2">
+                <CardContent className="px-5 pb-5 space-y-2.5">
                   {portfolio.skills
                     .filter((s) => s.is_discovered)
                     .map((s) => (
-                      <div key={s.id} className="text-sm flex items-center gap-2">
-                        <span className="font-medium">{s.skill_label}</span>
-                        <span className="text-muted-foreground">
-                          {s.ai_level} ({s.ai_confidence?.toLowerCase() === "low" ? "low confidence" : "confirmed"})
-                        </span>
-                        <span className="text-xs text-muted-foreground">— Not required for this role, may be additive.</span>
+                      <div key={s.id} className="text-xs flex items-center justify-between p-3 rounded-xl bg-slate-800/40 border border-slate-800">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-white">{s.skill_label}</span>
+                          <span className="px-2 py-0.5 rounded-full bg-slate-700 text-slate-300 text-[10px]">
+                            {s.ai_level || "Unassessed"}
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-slate-400">Nilai tambah di luar kualifikasi posisi</span>
                       </div>
                     ))}
                 </CardContent>

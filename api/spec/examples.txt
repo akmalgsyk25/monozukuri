@@ -1,13 +1,20 @@
 example_id                                          | status | run_time        |
 --------------------------------------------------- | ------ | --------------- |
-./spec/requests/api/v1/portfolios_spec.rb[1:1:1:1]  | passed | 0.2166 seconds  |
-./spec/requests/api/v1/portfolios_spec.rb[1:1:2:1]  | passed | 0.3527 seconds  |
-./spec/requests/api/v1/portfolios_spec.rb[1:2:1]    | passed | 0.30962 seconds |
-./spec/requests/api/v1/sessions_spec.rb[1:1:1:1]    | passed | 0.69364 seconds |
-./spec/requests/api/v1/sessions_spec.rb[1:1:2:1]    | passed | 0.24805 seconds |
-./spec/requests/api/v1/sessions_spec.rb[1:2:1]      | passed | 0.21574 seconds |
-./spec/requests/api/v1/sessions_spec.rb[1:2:2]      | passed | 0.22666 seconds |
-./spec/services/portfolios/generator_spec.rb[1:1:1] | passed | 0.47278 seconds |
-./spec/services/portfolios/generator_spec.rb[1:2:1] | passed | 0.35574 seconds |
-./spec/services/sessions/end_handler_spec.rb[1:1:1] | passed | 0.2285 seconds  |
-./spec/services/sessions/end_handler_spec.rb[1:1:2] | passed | 0.25121 seconds |
+./spec/requests/api/v1/fitgap_spec.rb[1:1:1]        | passed | 0.25389 seconds |
+./spec/requests/api/v1/fitgap_spec.rb[1:2:1]        | passed | 2.12 seconds    |
+./spec/requests/api/v1/fitgap_spec.rb[1:2:2]        | passed | 0.23591 seconds |
+./spec/requests/api/v1/portfolios_spec.rb[1:1:1:1]  | passed | 0.29444 seconds |
+./spec/requests/api/v1/portfolios_spec.rb[1:1:2:1]  | passed | 0.25016 seconds |
+./spec/requests/api/v1/portfolios_spec.rb[1:2:1]    | passed | 0.97318 seconds |
+./spec/requests/api/v1/sessions_spec.rb[1:1:1:1]    | passed | 0.2608 seconds  |
+./spec/requests/api/v1/sessions_spec.rb[1:1:2:1]    | passed | 0.21519 seconds |
+./spec/requests/api/v1/sessions_spec.rb[1:2:1]      | passed | 0.20933 seconds |
+./spec/requests/api/v1/sessions_spec.rb[1:2:2]      | passed | 0.21579 seconds |
+./spec/services/exports/pdf_generator_spec.rb[1:1]  | passed | 0.25962 seconds |
+./spec/services/exports/pdf_generator_spec.rb[1:2]  | passed | 0.44687 seconds |
+./spec/services/fit_gap/engine_spec.rb[1:1:1]       | passed | 0.22655 seconds |
+./spec/services/fit_gap/engine_spec.rb[1:2:1]       | passed | 0.22108 seconds |
+./spec/services/portfolios/generator_spec.rb[1:1:1] | passed | 0.42129 seconds |
+./spec/services/portfolios/generator_spec.rb[1:2:1] | passed | 0.24345 seconds |
+./spec/services/sessions/end_handler_spec.rb[1:1:1] | passed | 0.22329 seconds |
+./spec/services/sessions/end_handler_spec.rb[1:1:2] | passed | 0.23361 seconds |

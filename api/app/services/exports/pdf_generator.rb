@@ -81,9 +81,14 @@ module Exports
       pdf.font_size(11) do
         pdf.text "#{skill.skill_label}", style: :bold
 
-        level_text = "Level: #{LEVEL_LABELS[effective_level]}"
-        level_text += " (AI: #{LEVEL_LABELS[skill.ai_level]} → Override: #{LEVEL_LABELS[override.override_level]})" if override
-        level_text += "  |  Confidence: #{CONFIDENCE_LABELS[skill.ai_confidence] || skill.ai_confidence}"
+        level_name = LEVEL_LABELS[effective_level] || 'Unassessed'
+        level_text = "Level: #{level_name}"
+        if override
+          ai_name = LEVEL_LABELS[skill.ai_level] || 'Unassessed'
+          level_text += " (AI: #{ai_name} → Override: #{LEVEL_LABELS[override.override_level]})"
+        end
+        confidence_name = CONFIDENCE_LABELS[skill.ai_confidence] || skill.ai_confidence || 'Unassessed'
+        level_text += "  |  Confidence: #{confidence_name}"
         pdf.text level_text
       end
 
