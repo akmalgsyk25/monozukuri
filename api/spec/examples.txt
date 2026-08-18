@@ -1,0 +1,8 @@
+example_id                                          | status | run_time        |
+--------------------------------------------------- | ------ | --------------- |
+./spec/requests/api/v1/sessions_spec.rb[1:1:1:1]    | passed | 0.22681 seconds |
+./spec/requests/api/v1/sessions_spec.rb[1:1:2:1]    | passed | 0.31879 seconds |
+./spec/requests/api/v1/sessions_spec.rb[1:2:1]      | passed | 0.78103 seconds |
+./spec/requests/api/v1/sessions_spec.rb[1:2:2]      | passed | 0.25946 seconds |
+./spec/services/sessions/end_handler_spec.rb[1:1:1] | passed | 0.35509 seconds |
+./spec/services/sessions/end_handler_spec.rb[1:1:2] | passed | 0.21477 seconds |
