@@ -18,8 +18,8 @@ module Gemini
     class TimeoutError < ApiError; end
 
     def initialize(model: nil, api_key: nil, timeout: 60)
-      @model = model
-      @api_key = api_key || ENV.fetch('GEMINI_API_KEY')
+      @model = (model || ENV.fetch('GEMINI_FLASH_MODEL', 'gemini-3.6-flash')).to_s.tr('"\'', '').strip
+      @api_key = (api_key || ENV.fetch('GEMINI_API_KEY')).to_s.tr('"\'', '').strip
       @timeout = timeout
       @connection = build_connection
     end
@@ -38,7 +38,7 @@ module Gemini
     private
 
     def generate_url
-      "#{BASE_URL}/models/#{@model}:generateContent"
+      "#{BASE_URL}/models/#{@model}:generateContent?key=#{@api_key}"
     end
 
     def request_headers
