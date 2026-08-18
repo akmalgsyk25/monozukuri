@@ -175,15 +175,34 @@ export default function AssessmentInvitePage() {
     }
   };
 
+  const formatInviteUrl = (session?: Session | null) => {
+    if (!session) return "";
+    if (session.invite_token) {
+      return `${window.location.origin}/interview/${session.invite_token}`;
+    }
+    if (session.invite_url) {
+      try {
+        const url = new URL(session.invite_url);
+        if (url.port === "3001") {
+          return `${window.location.origin}${url.pathname}`;
+        }
+      } catch {
+        // Fallback
+      }
+      return session.invite_url;
+    }
+    return "";
+  };
+
   const copyLink = (session: Session, id: number) => {
-    navigator.clipboard.writeText(session.invite_url);
+    navigator.clipboard.writeText(formatInviteUrl(session));
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };
 
   const copyNewSessionLink = () => {
-    if (!newSession?.invite_url) return;
-    navigator.clipboard.writeText(newSession.invite_url);
+    if (!newSession) return;
+    navigator.clipboard.writeText(formatInviteUrl(newSession));
     setNewSessionCopied(true);
     setTimeout(() => setNewSessionCopied(false), 2000);
   };
@@ -262,7 +281,7 @@ export default function AssessmentInvitePage() {
             </p>
             <div className="flex items-center gap-2 border rounded-md px-3 py-2 bg-white">
               <span className="flex-1 text-sm font-mono truncate text-muted-foreground">
-                {newSession.invite_url}
+                {formatInviteUrl(newSession)}
               </span>
             </div>
             <Button variant="outline" size="sm" onClick={copyNewSessionLink} className="w-full">

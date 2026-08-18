@@ -3,12 +3,6 @@
 Rails.application.routes.draw do
   get '/health', to: proc { [200, {}, [{ status: 'ok' }.to_json]] }
 
-  # Redirect candidate interview URL to frontend SPA
-  get '/interview/:token', to: redirect { |params, _request|
-    frontend_base = ENV['FRONTEND_URL'].presence || ENV['APP_FRONTEND_URL'].presence || 'http://localhost:5173'
-    "#{frontend_base}/interview/#{params[:token]}"
-  }
-
   namespace :api do
     namespace :v1 do
       # Auth
