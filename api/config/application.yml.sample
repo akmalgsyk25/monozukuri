@@ -27,4 +27,4 @@ TOKEN_EXPIRATION_TIME: "259200"  # 3 days in seconds
 ALLOWED_ORIGINS: "*"
 
 # Sidekiq / Redis
-REDIS_URL: "redis://localhost:6379/1"
+REDIS_URI: "redis://:redispw123@localhost:6379/0"

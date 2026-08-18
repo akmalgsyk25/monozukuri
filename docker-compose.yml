@@ -17,7 +17,6 @@ services:
       - SECRET_KEY_BASE=rakamin_dev_secret_key_base_123456789012345678901234567890
       - DATABASE_URL=postgresql://postgres:postgrespw123@host.docker.internal:5432/rakamin_development
       - REDIS_URI=redis://:redispw123@host.docker.internal:6379/0
-      - REDIS_URL=redis://:redispw123@host.docker.internal:6379/0
       - GEMINI_API_KEY=dummy_key_or_replace_with_real
       - GEMINI_LIVE_MODEL=gemini-2.0-flash-live-001
       - GEMINI_FLASH_MODEL=gemini-2.0-flash-001
@@ -39,7 +38,6 @@ services:
       - SECRET_KEY_BASE=rakamin_dev_secret_key_base_123456789012345678901234567890
       - DATABASE_URL=postgresql://postgres:postgrespw123@host.docker.internal:5432/rakamin_development
       - REDIS_URI=redis://:redispw123@host.docker.internal:6379/0
-      - REDIS_URL=redis://:redispw123@host.docker.internal:6379/0
       - GEMINI_API_KEY=dummy_key_or_replace_with_real
       - GEMINI_LIVE_MODEL=gemini-2.0-flash-live-001
       - GEMINI_FLASH_MODEL=gemini-2.0-flash-001

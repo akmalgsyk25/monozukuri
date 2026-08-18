@@ -2,7 +2,7 @@
 
 class Rack::Attack
   # Use Redis for distributed throttle state across pods.
-  redis_url = ENV['REDIS_URI'].presence || ENV.fetch('REDIS_URL', 'redis://:redispw123@localhost:6379/0')
+  redis_url = ENV.fetch('REDIS_URI', 'redis://:redispw123@localhost:6379/0')
   Rack::Attack.cache.store = ActiveSupport::Cache::RedisCacheStore.new(
     url: redis_url
   )

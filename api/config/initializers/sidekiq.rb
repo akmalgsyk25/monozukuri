@@ -2,7 +2,7 @@
 
 SIDEKIQ_STATUS_FILE = Rails.root.join('tmp/sidekiq_status').freeze
 
-redis_url = ENV['REDIS_URI'].presence || ENV.fetch('REDIS_URL', 'redis://:redispw123@localhost:6379/0')
+redis_url = ENV.fetch('REDIS_URI', 'redis://:redispw123@localhost:6379/0')
 
 Sidekiq.configure_server do |config|
   config.redis = { url: redis_url }
