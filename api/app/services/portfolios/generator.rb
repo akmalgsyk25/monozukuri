@@ -148,34 +148,59 @@ module Portfolios
     end
 
     def save_skills(portfolio, response)
-      data = response.is_a?(Hash) ? response : JSON.parse(response)
+      data = parse_json_response(response)
 
       # Destroy existing skills (idempotent regeneration)
       portfolio.portfolio_skills.destroy_all
 
       (data['configured_skills'] || []).each do |skill_data|
+        level = parse_skill_level(skill_data['level'])
+
         portfolio.portfolio_skills.create!(
           skill_id:           skill_data['skill_id'],
           skill_label:        skill_data['skill_label'],
           is_discovered:      false,
-          ai_level:           skill_data['level'].to_i.clamp(1, 5),
-          ai_confidence:      skill_data['confidence'],
+          ai_level:           level,
+          ai_confidence:      skill_data['confidence']&.to_s&.downcase.presence,
           evidence:           Array(skill_data['evidence']).first(3),
           competency_summary: skill_data['competency_summary']
         )
       end
 
       (data['discovered_skills'] || []).each do |skill_data|
+        level = parse_skill_level(skill_data['level'])
+
         portfolio.portfolio_skills.create!(
           skill_id:           nil,
           skill_label:        skill_data['skill_label'],
           is_discovered:      true,
-          ai_level:           skill_data['level'].to_i.clamp(1, 5),
-          ai_confidence:      skill_data['confidence'],
+          ai_level:           level,
+          ai_confidence:      skill_data['confidence']&.to_s&.downcase.presence,
           evidence:           Array(skill_data['evidence']).first(3),
           competency_summary: skill_data['competency_summary']
         )
       end
+    end
+
+    def parse_json_response(response)
+      return response if response.is_a?(Hash)
+
+      clean_text = response.to_s.strip
+      # Extract content inside markdown code fence if present
+      if clean_text =~ /```(?:json)?\s*([\s\S]*?)\s*```/m
+        clean_text = $1.strip
+      elsif clean_text =~ /\{[\s\S]*\}/m
+        clean_text = clean_text[/\{[\s\S]*\}/m]
+      end
+
+      JSON.parse(clean_text)
+    end
+
+    def parse_skill_level(level_value)
+      return nil if level_value.nil? || level_value == 0 || level_value == "0" || level_value.to_s.strip.empty?
+
+      level_int = level_value.to_i
+      level_int.between?(1, 5) ? level_int : nil
     end
   end
 end

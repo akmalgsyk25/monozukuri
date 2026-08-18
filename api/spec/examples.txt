@@ -1,8 +1,13 @@
 example_id                                          | status | run_time        |
 --------------------------------------------------- | ------ | --------------- |
-./spec/requests/api/v1/sessions_spec.rb[1:1:1:1]    | passed | 0.22681 seconds |
-./spec/requests/api/v1/sessions_spec.rb[1:1:2:1]    | passed | 0.31879 seconds |
-./spec/requests/api/v1/sessions_spec.rb[1:2:1]      | passed | 0.78103 seconds |
-./spec/requests/api/v1/sessions_spec.rb[1:2:2]      | passed | 0.25946 seconds |
-./spec/services/sessions/end_handler_spec.rb[1:1:1] | passed | 0.35509 seconds |
-./spec/services/sessions/end_handler_spec.rb[1:1:2] | passed | 0.21477 seconds |
+./spec/requests/api/v1/portfolios_spec.rb[1:1:1:1]  | passed | 0.2166 seconds  |
+./spec/requests/api/v1/portfolios_spec.rb[1:1:2:1]  | passed | 0.3527 seconds  |
+./spec/requests/api/v1/portfolios_spec.rb[1:2:1]    | passed | 0.30962 seconds |
+./spec/requests/api/v1/sessions_spec.rb[1:1:1:1]    | passed | 0.69364 seconds |
+./spec/requests/api/v1/sessions_spec.rb[1:1:2:1]    | passed | 0.24805 seconds |
+./spec/requests/api/v1/sessions_spec.rb[1:2:1]      | passed | 0.21574 seconds |
+./spec/requests/api/v1/sessions_spec.rb[1:2:2]      | passed | 0.22666 seconds |
+./spec/services/portfolios/generator_spec.rb[1:1:1] | passed | 0.47278 seconds |
+./spec/services/portfolios/generator_spec.rb[1:2:1] | passed | 0.35574 seconds |
+./spec/services/sessions/end_handler_spec.rb[1:1:1] | passed | 0.2285 seconds  |
+./spec/services/sessions/end_handler_spec.rb[1:1:2] | passed | 0.25121 seconds |
