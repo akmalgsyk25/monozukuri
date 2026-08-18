@@ -42,7 +42,9 @@ module Gemini
     end
 
     def request_headers
-      { 'Content-Type' => 'application/json', 'x-goog-api-key' => @api_key }
+      headers = { 'Content-Type' => 'application/json', 'x-goog-api-key' => @api_key }
+      headers['Authorization'] = "Bearer #{@api_key}" if @api_key.to_s.start_with?('AQ.', 'ya29.')
+      headers
     end
 
     def request_body(prompt, temperature)

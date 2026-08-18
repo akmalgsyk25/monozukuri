@@ -7,7 +7,7 @@ require 'base64'
 module Gemini
   # Manages a persistent WebSocket connection to Gemini Live API.
   class LiveClient
-    GEMINI_WS_URL = 'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent'
+    GEMINI_WS_URL = 'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent'
 
     INACTIVITY_TIMEOUT = 30 # reconnect if Gemini produces no meaningful response
     GATE_OPEN_DELAY    = 0.8 # delay opening mic gate so frontend audio buffer drains and avoids echo loop
@@ -63,10 +63,14 @@ module Gemini
     # Opens the WebSocket and sends setup; resumes a prior session if a handle is provided.
     def connect(resumption_handle: nil)
       @setup_complete = false
+      ws_url = "#{GEMINI_WS_URL}?key=#{@api_key}"
+      headers = { 'x-goog-api-key' => @api_key }
+      headers['Authorization'] = "Bearer #{@api_key}" if @api_key.to_s.start_with?('AQ.', 'ya29.')
+
       @ws = Faye::WebSocket::Client.new(
-        GEMINI_WS_URL,
+        ws_url,
         nil,
-        headers: { 'x-goog-api-key' => @api_key }
+        headers: headers
       )
 
       @ws.on(:open)    { |_event| handle_ws_open(resumption_handle) }
