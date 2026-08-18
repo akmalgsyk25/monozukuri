@@ -77,7 +77,17 @@ else
   puts "  Created organization: id=#{result['id']} scheme=#{result['scheme']}"
 end
 
-# ── B7 Skill Taxonomy (22 pilot skills) ──────────────────────────────────────
+# ── Admin Users ─────────────────────────────────────────────────────────────
+[
+  { email: 'admin@rakamin.com', password: 'password123', role: 'admin' },
+  { email: 'akmalm2003@gmail.com', password: 'password123', role: 'admin' }
+].each do |user_attrs|
+  u = User.find_or_initialize_by(email: user_attrs[:email])
+  u.password = user_attrs[:password]
+  u.role = user_attrs[:role]
+  u.save!
+  puts "  User ready: #{u.email} (role: #{u.role})"
+end
 
 B7_SKILLS = [
   # ── Engineering ──────────────────────────────────────────────────────────────
