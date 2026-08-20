@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MONOZUKURI PRODUCT & ENGINEERING SUBMISSION REPORT — Rakamin AI Interview Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    @page {
+      size: A4;
+      margin: 20mm 15mm 20mm 15mm;
+      @bottom-right {
+        content: counter(page);
+        font-family: 'Inter', sans-serif;
+        font-size: 9pt;
+        color: #64748b;
+      }
+    }
+    
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 10pt;
+      line-height: 1.6;
+      color: #1e293b;
+      background-color: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1, h2, h3, h4, .brand-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #0f172a;
+      font-weight: 700;
+      margin-top: 1.5em;
+      margin-bottom: 0.5em;
+      page-break-after: avoid;
+    }
+
+    h1 {
+      font-size: 18pt;
+      font-weight: 800;
+      border-bottom: 2px solid #01959F;
+      padding-bottom: 6px;
+      margin-top: 0;
+      color: #007E88;
+    }
+
+    h2 {
+      font-size: 13pt;
+      color: #01959F;
+      border-left: 4px solid #01959F;
+      padding-left: 10px;
+      margin-top: 1.8em;
+    }
+
+    h3 {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    p, li {
+      color: #334155;
+      text-align: justify;
+    }
+
+    ul, ol {
+      margin-top: 0.3em;
+      margin-bottom: 0.8em;
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 0.3em;
+    }
+
+    .header-card {
+      background: linear-gradient(135deg, #01959F 0%, #005F66 100%);
+      color: #ffffff;
+      padding: 24px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+
+    .header-card h1 {
+      color: #ffffff;
+      border-bottom: 1px solid rgba(255,255,255,0.25);
+      font-size: 18pt;
+      margin: 0 0 8px 0;
+      padding-bottom: 8px;
+    }
+
+    .header-card p {
+      color: rgba(255,255,255,0.9);
+      margin: 4px 0;
+      font-size: 9.5pt;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 14px;
+      background: rgba(0,0,0,0.15);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 9pt;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 8pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-p0 { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+    .badge-p1 { background-color: #ffedd5; color: #c2410c; border: 1px solid #fdba74; }
+    .badge-p2 { background-color: #fef9c3; color: #a16207; border: 1px solid #fde047; }
+    .badge-p3 { background-color: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
+    .badge-success { background-color: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 8.5pt;
+      page-break-inside: avoid;
+    }
+
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    code, pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8.5pt;
+    }
+
+    code {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      padding: 2px 5px;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+    }
+
+    pre {
+      background-color: #0f172a;
+      color: #f8fafc;
+      padding: 12px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 10px 0;
+      line-height: 1.45;
+      page-break-inside: avoid;
+    }
+
+    .callout {
+      border-left: 4px solid #01959F;
+      background-color: #f0fdfa;
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      margin: 12px 0;
+      font-size: 9pt;
+    }
+
+    .callout-title {
+      font-weight: 700;
+      color: #007E88;
+      margin-bottom: 4px;
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+
+    a {
+      color: #01959F;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- COVER / HEADER CARD -->
+  <div class="header-card">
+    <h1>MONOZUKURI PRODUCT & ENGINEERING REPORT</h1>
+    <p style="font-size: 11pt; font-weight: 600;">AI-Powered Talent Assessment & Skill Intelligence Platform</p>
+    <p>Case Study: Fullstack Product Engineer — Transformasi Arsitektur & Craftsmanship</p>
+    
+    <div class="meta-grid">
+      <div><strong>Applicant:</strong> Akmal Muzakki (akmalmzkki25)</div>
+      <div><strong>Date:</strong> 20 August 2026</div>
+      <div><strong>Fork Repository:</strong> <a href="https://github.com/akmalmzkki25/monozukuri" style="color: #FBC037;">github.com/akmalmzkki25/monozukuri</a></div>
+      <div><strong>Branch:</strong> <code>monozukuri</code></div>
+    </div>
+  </div>
+
+  <!-- EXECUTIVE SUMMARY -->
+  <h2>Executive Summary</h2>
+  <p>
+    Dokumen ini menyajikan laporan eksekusi lengkap transformasi produk dan rekayasa perangkat lunak fullstack untuk <strong>Rakamin AI Interview Platform</strong>. Berlandaskan filosofi <strong>Monozukuri (物作り — Craftsmanship & Pride in Making)</strong>, platform ini telah ditingkatkan dari prototipe awal menjadi sistem intelijen talenta berbasis suara yang andal, aman, mematuhi regulasi <strong>UU PDP No. 27/2022</strong>, dan siap pakai untuk proses rekrutmen berskala enterprise.
+  </p>
+
+  <div class="callout">
+    <div class="callout-title">Pencapaian Utama yang Berhasil Dikirimkan:</div>
+    <ul style="margin: 4px 0; padding-left: 18px;">
+      <li><strong>Wawancara Suara Live Real-Time</strong>: Terintegrasi dengan Google Gemini Multimodal Live WebSocket API (<code>v1alpha</code> pada <code>gemini-2.5-flash-native-audio-latest</code>), silence-pump VAD, dan visualizer waveform responsif.</li>
+      <li><strong>Portofolio Berbasis Bukti Otentik (Evidence-Grounded)</strong>: Evaluasi otomatis transkrip via <code>gemini-3.1-pro-preview</code> yang mengekstrak kutipan verbatim ucapan kandidat dan anchor level L1-L5 tanpa halusinasi.</li>
+      <li><strong>Fit/Gap Intelligence Engine</strong>: Komparasi multi-level yang null-safe antara portofolio kandidat dengan persyaratan lowongan, override penilai, serta ekspor dossier PDF (Prawn) dan JSON secara instan.</li>
+      <li><strong>Test Harness 100% Lulus</strong>: RSpec test suite lengkap (<strong>18 examples, 0 failures</strong>), pembuktian Seeded Fault Test, dan perbaikan menyeluruh antarmuka web modern bergaya Rakamin (Light / Dark / System mode).</li>
+    </ul>
+  </div>
+
+  <!-- STEP 1 -->
+  <h2>Step 1: Setup & Local Exploration Narrative</h2>
+  <p>
+    Pada tahap awal eksplorasi repositori, ditemukan beberapa technical debt mendasar yang menghambat keandalan sistem:
+  </p>
+  <ul>
+    <li><strong>Ketiadaan Test Harness</strong>: Direktori RSpec tidak memiliki file spec aktif, sehingga tidak ada pengujian otomatis untuk mencegah regresi logika.</li>
+    <li><strong>Fragmentasi Konfigurasi Environment</strong>: Inkonsistensi antara <code>docker-compose.yml</code>, <code>application.yml</code>, dan <code>.env</code> yang memicu error koneksi database PostgreSQL dan Redis.</li>
+    <li><strong>Port Mismatch pada Invite Link</strong>: URL invite sesi kandidat mengarah langsung ke backend Rails port <code>3001</code> alih-alih frontend React Vite di port <code>5173</code>.</li>
+  </ul>
+  <p>
+    <strong>Aksi Perbaikan:</strong> Membangun Docker Compose terpadu dengan sanitasi environment key, inisialisasi schema PostgreSQL multi-tenant (<code>test-corp</code>), dan merancang test harness RSpec dengan database cleaner dan helper otentikasi.
+  </p>
+
+  <!-- STEP 2 -->
+  <h2>Step 2: Deep Context & Domain Immersion (5 Core Pillars)</h2>
+  <ol>
+    <li><strong>The Product</strong>: Nilai sejati platform bukan sekadar bot wawancara otomatis, melainkan instrumen pembangun <em>portofolio kompetensi yang dapat dipertanggungjawabkan</em> dengan bukti kutipan otentik.</li>
+    <li><strong>The Industry</strong>: Di Indonesia, perusahaan menerima 500+ pelamar per posisi teknis. Solusi suara otomatis dengan anchor objektif L1-L5 memberikan standarisasi penilaian tanpa bias latar belakang kampus.</li>
+    <li><strong>What It Is For</strong>: Memberikan kesempatan adil bagi seluruh talenta untuk membuktikan kedalaman berpikir teknis melalui asesmen terkalibrasi.</li>
+    <li><strong>The Users (Asesor & Rekruter)</strong>: Rekruter membutuhkan ringkasan kecocokan instan (Fit/Gap) dan ekspor PDF 1-klik, sementara Tech Lead membutuhkan transparansi bukti kutipan dan wewenang override penilaian.</li>
+    <li><strong>The People Affected & UU PDP (UU No. 27/2022)</strong>: Kandidat tidak memilih sistem ini, sehingga sistem wajib menjunjung tinggi empati (hardware check ramah jaringan Indonesia) serta kepatuhan privasi (masking parameter log, pemrosesan audio ephemeral tanpa penyimpanan pihak ketiga).</li>
+  </ol>
+
+  <div class="page-break"></div>
+
+  <!-- STEP 3 -->
+  <h2>Step 3: Defining Problem & Gap to Ideal Condition (P0–P3 Matrix)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 10%;">ID</th>
+        <th style="width: 12%;">Severity</th>
+        <th style="width: 22%;">Kategori</th>
+        <th style="width: 28%;">Deskripsi Masalah (Gap)</th>
+        <th style="width: 28%;">Dampak pada User & Workflow</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>GAP-01</strong></td>
+        <td><span class="badge badge-p0">P0 - Blocker</span></td>
+        <td>Defective Implementation</td>
+        <td>WebSocket Gemini Live mengarah ke endpoint <code>v1beta</code> dengan format model tidak valid.</td>
+        <td>Wawancara suara langsung gagal seketika (error code 1008); kandidat tidak dapat diuji.</td>
+      </tr>
+      <tr>
+        <td><strong>GAP-02</strong></td>
+        <td><span class="badge badge-p0">P0 - Blocker</span></td>
+        <td>Defective Implementation</td>
+        <td>Hardware speed test melakukan POST ke domain eksternal terblokir CORS (<code>httpbin.org</code>).</td>
+        <td>Kandidat terkunci di halaman pre-flight check dengan error merah di console.</td>
+      </tr>
+      <tr>
+        <td><strong>GAP-03</strong></td>
+        <td><span class="badge badge-p0">P0 - Blocker</span></td>
+        <td>Defective Implementation</td>
+        <td><code>Session#invite_url</code> mengarah ke backend Rails port <code>3001</code>.</td>
+        <td>Kandidat yang membuka link undangan menerima JSON mentah/404 alih-alih UI wawancara.</td>
+      </tr>
+      <tr>
+        <td><strong>GAP-04</strong></td>
+        <td><span class="badge badge-p1">P1 - High</span></td>
+        <td>Defective Implementation</td>
+        <td><code>Portfolios::Generator</code> memanggil model lama dan tidak memiliki filter markdown code fences.</td>
+        <td>Generasi portofolio gagal total akibat JSON parse error saat menerima response LLM.</td>
+      </tr>
+      <tr>
+        <td><strong>GAP-05</strong></td>
+        <td><span class="badge badge-p1">P1 - High</span></td>
+        <td>Defective Implementation</td>
+        <td>Kalkulasi Fit/Gap melakukan pengurangan langsung pada nilai <code>nil</code> (<code>NoMethodError: - for nil</code>).</td>
+        <td>Server crash saat membuat laporan Fit/Gap bagi kandidat dengan unassessed skills.</td>
+      </tr>
+      <tr>
+        <td><strong>GAP-06</strong></td>
+        <td><span class="badge badge-p1">P1 - High</span></td>
+        <td>Missing Specification</td>
+        <td>Background job generasi portofolio tidak memiliki row lock dan idempotency guard.</td>
+        <td>Terjadi duplikasi data skill di database saat pengguna menekan tombol retry berkali-kali.</td>
+      </tr>
+      <tr>
+        <td><strong>GAP-07</strong></td>
+        <td><span class="badge badge-p2">P2 - Medium</span></td>
+        <td>Missing Specification</td>
+        <td>Tidak ada mekanisme bagi penilai untuk melakukan override skor AI dengan catatan audit.</td>
+        <td>Asesor tidak dapat mengoreksi evaluasi AI yang terlalu keras atau kurang akurat.</td>
+      </tr>
+      <tr>
+        <td><strong>GAP-08</strong></td>
+        <td><span class="badge badge-p3">P3 - Low</span></td>
+        <td>Missing Specification</td>
+        <td>Ketiadaan tombol ekspor portofolio dan hasil asesmen ke format PDF / JSON.</td>
+        <td>Rekruter kesulitan membagikan laporan kandidat secara offline kepada hiring manager.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- STEP 4 -->
+  <h2>Step 4: Revamp Strategy, Acceptance Criteria & Trade-offs</h2>
+  
+  <h3>Matriks Evaluasi Pilihan Solusi</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Dimensi Evaluasi</th>
+        <th>Option A: Ad-Hoc Hotfixing</th>
+        <th>Option B: Monozukuri Revamp (Dipilih)</th>
+        <th>Option C: Microservices Extraction</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Product Impact</strong></td>
+        <td>Rendah (Hanya menambal koneksi, scoring tetap rapuh).</td>
+        <td><strong>Maksimal</strong> (Transformasi dossier bukti otentik & UX modern).</td>
+        <td>Moderat (Menambah latency network hops).</td>
+      </tr>
+      <tr>
+        <td><strong>Engineering Cost</strong></td>
+        <td>1 hari pengerjaan.</td>
+        <td><strong>3 hari pengerjaan</strong> (Sangat pas dengan deadline).</td>
+        <td>2+ minggu (Membutuhkan multi-pipeline).</td>
+      </tr>
+      <tr>
+        <td><strong>Maintainability</strong></td>
+        <td>Buruk (Technical debt tetap bersarang).</td>
+        <td><strong>Tinggi</strong> (Layanan idiomatik Rails & TypeScript bersih).</td>
+        <td>Kompleks (Perlu distributed tracing).</td>
+      </tr>
+      <tr>
+        <td><strong>Rasionalisasi</strong></td>
+        <td>Ditolak karena tidak memenuhi standar Monozukuri.</td>
+        <td><strong>Dipilih</strong> karena memberikan keandalan sistem tertinggi.</td>
+        <td>Ditolak karena over-engineering untuk tahap ini.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Self-Derived Acceptance Criteria:</h3>
+  <ul>
+    <li><strong>Penanganan Unassessed Skills</strong>: Nilai <code>nil</code> tidak boleh memicu crash; ditandai status <code>not_assessed</code> dengan delta 0.</li>
+    <li><strong>Ketahanan Output LLM</strong>: Parser secara otomatis membersihkan bungkus markdown ```json untuk mengekstrak data murni.</li>
+    <li><strong>Assessor Override</strong>: Penilai dapat mengubah level skor dengan pencatatan audit trail (<code>overridden_by</code>, <code>overridden_at</code>, <code>assessor_notes</code>).</li>
+    <li><strong>Idempotensi & Transaksi</strong>: Re-generasi portofolio dibungkus dalam <code>ActiveRecord::Base.transaction</code> untuk menjamin integritas data 100%.</li>
+    <li><strong>VAD & Silence Pump</strong>: Injeksi frame 0x00 PCM setiap 30ms saat jeda bicara agar VAD Gemini menandai pergantian giliran bicara dengan mulus.</li>
+  </ul>
+
+  <div class="page-break"></div>
+
+  <!-- STEP 5 -->
+  <h2>Step 5: Monozukuri Implementation & Proof of Craftsmanship</h2>
+
+  <h3>1. Bukti Ketahanan Test Harness (RSpec Evidence)</h3>
+  <pre>
+Finished in 7.08 seconds (files took 13.54 seconds to load)
+18 examples, 0 failures
+
+Randomized with seed 16362
+  </pre>
+  <p>
+    Seluruh test case mencakup unit model <code>Session</code>, worker idempotency <code>Portfolios::Generator</code>, logika komparasi <code>FitGap::Engine</code>, otentikasi token JWT, serta integritas stream biner <code>Exports::PdfGenerator</code>.
+  </p>
+
+  <h3>2. Bukti Uji Kerusakan Terencana (Seeded Fault Test Proof)</h3>
+  <p>
+    Untuk membuktikan bahwa test harness kami benar-benar menguji logika dan bukan sekadar tes formalitas:
+  </p>
+  <ol>
+    <li><strong>Injeksi Kerusakan</strong>: Di <code>app/services/fit_gap/engine.rb</code>, guard <code>candidate_level.nil?</code> sengaja dihapus dan diganti dengan pengurangan langsung <code>delta = candidate_level - required_level</code>.</li>
+    <li><strong>Hasil Eksekusi</strong>: RSpec langsung gagal dengan pesan <code>NoMethodError: undefined method '-' for nil:NilClass</code>.</li>
+    <li><strong>Restorasi</strong>: Logika null-safe dikembalikan (<code>candidate_level ? (candidate_level - required_level) : nil</code>), dan seluruh 18 test kembali hijau (PASSING).</li>
+  </ol>
+
+  <h3>3. AI Verification Moment</h3>
+  <div class="callout">
+    <div class="callout-title">Kasus Kesalahan Kode AI & Koreksi Mandiri:</div>
+    <p>
+      Tool AI menyarankan endpoint WebSocket live: <code>wss://.../v1beta/...BidiGenerateContent</code> dengan model <code>gemini-2.0-flash-exp</code>. Saat diuji, koneksi ditolak dengan error <code>1008</code>.<br>
+      <strong>Investigasi & Solusi</strong>: Kami melakukan riset langsung ke arsitektur produksi Google Gemini API per Agustus 2026 dan menemukan bahwa endpoint Live WebSocket harus menggunakan <strong><code>v1alpha</code></strong> dengan model <strong><code>gemini-2.5-flash-native-audio-latest</code></strong>, sedangkan REST API memakai <strong><code>gemini-3.1-pro-preview</code></strong>. Setelah dikoreksi, koneksi live audio berjalan 100% mulus.
+    </p>
+  </div>
+
+  <h3>4. Kepatuhan Hukum UU PDP No. 27/2022 (Data Protection)</h3>
+  <ul>
+    <li><strong>Log Masking</strong>: Menambahkan parameter sensitif ke <code>config/initializers/filter_parameter_logging.rb</code> (<code>:invite_token</code>, <code>:evidence</code>, <code>:transcript</code>, <code>:audio_data</code>, <code>:candidate_name</code>).</li>
+    <li><strong>Migrasi Reversibel</strong>: Seluruh file migrasi database memiliki blok <code>up</code> dan <code>down</code> yang aman.</li>
+    <li><strong>Minimisasi Data</strong>: Buffer audio diproses secara ephemeral dan tidak disimpan di server pihak ketiga.</li>
+  </ul>
+
+  <!-- STEP 6 -->
+  <h2>Step 6: Submission Deliverables & Video Walkthrough Guide</h2>
+
+  <div class="callout" style="background-color: #f8fafc; border-left-color: #007E88;">
+    <div class="callout-title">Informasi Pull Request & Repository:</div>
+    <p>
+      • <strong>Fork Repository</strong>: <a href="https://github.com/akmalmzkki25/monozukuri">https://github.com/akmalmzkki25/monozukuri</a><br>
+      • <strong>Upstream Target</strong>: <code>https://github.com/rakamindev/ai-interview-platform</code><br>
+      • <strong>Branch</strong>: <code>monozukuri</code><br>
+      • <strong>Link Pull Request</strong>: <a href="https://github.com/akmalmzkki25/monozukuri/pull/new/monozukuri">Buka Pull Request di GitHub</a><br>
+      • <strong>Judul PR</strong>: <code>feat(monozukuri): End-to-End AI Talent Intelligence Platform Revamp</code>
+    </p>
+  </div>
+
+  <h3>Rancangan Video Walkthrough (3–5 Menit):</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 20%;">Waktu</th>
+        <th style="width: 25%;">Tampilan Layar</th>
+        <th style="width: 55%;">Poin Narasi & Demonstrasi</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>00:00 – 00:45</strong></td>
+        <td>Login & Portal Penilai</td>
+        <td>Problem statement, arsitektur awal yang rapuh, dan visi Monozukuri.</td>
+      </tr>
+      <tr>
+        <td><strong>00:45 – 01:45</strong></td>
+        <td>Ruang Wawancara Live</td>
+        <td>Hardware check VU meter, waveform visualizer audio, dan percakapan suara AI.</td>
+      </tr>
+      <tr>
+        <td><strong>01:45 – 02:45</strong></td>
+        <td>Portofolio Kompetensi</td>
+        <td>Kartu level L1-L5, kutipan verbatim kandidat, penanganan unassessed skills.</td>
+      </tr>
+      <tr>
+        <td><strong>02:45 – 03:45</strong></td>
+        <td>Fit/Gap & Ekspor PDF</td>
+        <td>Matriks kesesuaian posisi, override penilai, dan download PDF dossier instan.</td>
+      </tr>
+      <tr>
+        <td><strong>03:45 – 04:30</strong></td>
+        <td>Engineering Rigor</td>
+        <td>18 RSpec tests passing, Seeded Fault verification, dan UU PDP compliance.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- CONCLUSION -->
+  <h2>Conclusion & Live Technical Defense Readiness</h2>
+  <p>
+    Seluruh aspek dalam tugas take-home ini dikerjakan dengan standar keahlian tertinggi. Mulai dari protokol transmisi audio bidi-streaming, ketahanan kalkulasi matematika, hingga antarmuka pengguna bebas AI-slop dengan tema adaptif, platform ini siap dipertanggungjawabkan pada sesi <em>Live Technical Defense</em> bersama CTO dan Technical Lead.
+  </p>
+
+</body>
+</html>
