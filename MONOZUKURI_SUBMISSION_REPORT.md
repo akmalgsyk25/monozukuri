@@ -276,11 +276,20 @@ In accordance with **Indonesia's Personal Data Protection Law (UU PDP No. 27/202
 
 ### 3. Visual Screenshot Showcase (Included in Submission PDF)
 
-1. **Candidate Pre-Flight & Hardware Check Screen**: Responsive network speed test and microphone volume indicator.
-2. **Live AI Interview Screen**: Real-time waveform audio visualizer and session control buttons.
-3. **Candidate Portfolio Dashboard**: Structured competency matrix, unassessed badges, and expandable transcript evidence.
-4. **Role Fit/Gap Comparison View**: Interactive gap analysis against specific vacancies with assessor override modal.
-5. **Executive PDF Export Dossier**: Formatted A4 printable report with corporate headers, scoring radar, and detailed evidence quotes.
+1. **Figure 1: Portal Penilai & Rekruter (Brand Monogram & Dual-Theme Engine)**
+   ![Portal Penilai](docs/screenshots/01_login_portal.png)
+
+2. **Figure 2: Candidate Pre-Flight & Hardware Check (VU Meter Mikrofon & Local Speed Test)**
+   ![Hardware Check](docs/screenshots/02_hardware_check.png)
+
+3. **Figure 3: Ruang Wawancara Suara Live (Waveform Audio Visualizer & State Indicators)**
+   ![Live Interview](docs/screenshots/03_live_interview.png)
+
+4. **Figure 4: Candidate Portfolio Dashboard (Anchor L1–L5 & Kutipan Verbatim Ucapan Kandidat)**
+   ![Portofolio Kompetensi](docs/screenshots/04_portfolio_evidence.png)
+
+5. **Figure 5: Role Fit/Gap Comparison View & Executive PDF Export Dossier**
+   ![Fit/Gap Report](docs/screenshots/05_fitgap_export.png)
 
 ---
 

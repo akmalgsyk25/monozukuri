@@ -4,6 +4,7 @@ require 'prawn'
 require 'prawn/table'
 
 pdf_path = '/ai-interview/MONOZUKURI_SUBMISSION_REPORT.pdf'
+screenshots_dir = '/ai-interview-root/docs/screenshots'
 
 Prawn::Document.generate(pdf_path, page_size: 'A4', margin: [36, 36, 36, 36]) do |pdf|
   # Colors
@@ -156,6 +157,64 @@ Prawn::Document.generate(pdf_path, page_size: 'A4', margin: [36, 36, 36, 36]) do
     t.column(1).width = 110
   end
 
+  # ── Visual Screenshot Showcase Pages ─────────────────────────────────────────
+  pdf.start_new_page
+  section_heading(pdf, 'Visual UI/UX Showcase (Screenshots 1 & 2)')
+
+  # Screenshot 1: Login Portal
+  img1_path = File.join(screenshots_dir, '01_login_portal.png')
+  if File.exist?(img1_path)
+    pdf.move_down 4
+    pdf.font('Helvetica', style: :bold, size: 9) { pdf.text 'Figure 1: Portal Penilai & Rekruter (Rakamin Monogram & Adaptive Theme Engine)', color: '0F172A' }
+    pdf.image img1_path, fit: [pdf.bounds.width, 220], position: :center
+  end
+
+  pdf.move_down 14
+
+  # Screenshot 2: Hardware Check
+  img2_path = File.join(screenshots_dir, '02_hardware_check.png')
+  if File.exist?(img2_path)
+    pdf.font('Helvetica', style: :bold, size: 9) { pdf.text 'Figure 2: Pre-Flight Hardware Check (VU Meter Mikrofon & Local Speed Test)', color: '0F172A' }
+    pdf.image img2_path, fit: [pdf.bounds.width, 220], position: :center
+  end
+
+  pdf.start_new_page
+  section_heading(pdf, 'Visual UI/UX Showcase (Screenshots 3 & 4)')
+
+  # Screenshot 3: Live Interview Room
+  img3_path = File.join(screenshots_dir, '03_live_interview.png')
+  if File.exist?(img3_path)
+    pdf.move_down 4
+    pdf.font('Helvetica', style: :bold, size: 9) { pdf.text 'Figure 3: Ruang Wawancara Suara Live (Waveform Audio Visualizer & State Indicator)', color: '0F172A' }
+    pdf.image img3_path, fit: [pdf.bounds.width, 210], position: :center
+  end
+
+  pdf.move_down 14
+
+  # Screenshot 4: Portfolio Evidence
+  img4_path = File.join(screenshots_dir, '04_portfolio_evidence.png')
+  if File.exist?(img4_path)
+    pdf.font('Helvetica', style: :bold, size: 9) { pdf.text 'Figure 4: Portofolio Kompetensi (Anchor L1-L5 & Kutipan Verbatim Ucapan Kandidat)', color: '0F172A' }
+    pdf.image img4_path, fit: [pdf.bounds.width, 230], position: :center
+  end
+
+  pdf.start_new_page
+  section_heading(pdf, 'Visual UI/UX Showcase (Screenshot 5 & Conclusion)')
+
+  # Screenshot 5: Fit/Gap & PDF Export
+  img5_path = File.join(screenshots_dir, '05_fitgap_export.png')
+  if File.exist?(img5_path)
+    pdf.move_down 4
+    pdf.font('Helvetica', style: :bold, size: 9) { pdf.text 'Figure 5: Fit/Gap Role Matching Matrix, Rekomendasi Budaya & Ekspor PDF Dossier', color: '0F172A' }
+    pdf.image img5_path, fit: [pdf.bounds.width, 240], position: :center
+  end
+
+  pdf.move_down 16
+  section_heading(pdf, 'Conclusion & Live Technical Defense Readiness')
+  pdf.font('Helvetica', size: 8.5) do
+    pdf.text 'Seluruh aspek dalam tugas take-home ini dikerjakan dengan standar craftsmanship tertinggi (Monozukuri). Mulai dari protokol transmisi audio bidi-streaming, ketahanan kalkulasi matematika, hingga antarmuka pengguna bebas AI-slop dengan tema adaptif, platform ini siap dipertanggungjawabkan pada sesi Live Technical Defense bersama CTO dan Technical Lead Rakamin.', inline_format: true
+  end
+
   # Footer Note on all pages
   pdf.number_pages '<page> / <total>', {
     start_count_at: 1,
@@ -166,4 +225,4 @@ Prawn::Document.generate(pdf_path, page_size: 'A4', margin: [36, 36, 36, 36]) do
   }
 end
 
-puts "PDF generated successfully at #{pdf_path}"
+puts "PDF with embedded screenshots generated successfully at #{pdf_path}"
