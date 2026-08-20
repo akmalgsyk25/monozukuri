@@ -25,8 +25,8 @@ Prawn::Document.generate(pdf_path, page_size: 'A4', margin: [36, 36, 36, 36]) do
     pdf.font('Helvetica', style: :bold, size: 10) { pdf.text 'AI-Powered Talent Assessment & Skill Intelligence Platform', color: 'FBC037' }
     pdf.move_down 4
     pdf.font('Helvetica', size: 8.5) do
-      pdf.text 'Case Study: Fullstack Product Engineer | Applicant: Akmal Muzakki (akmalmzkki25)'
-      pdf.text 'Fork Repo: https://github.com/akmalmzkki25/monozukuri | Branch: monozukuri | Date: 20 August 2026'
+      pdf.text 'Case Study: Fullstack Product Engineer | Applicant: Akmal Muzakki (akmalgsyk25)'
+      pdf.text 'Fork Repo: https://github.com/akmalgsyk25/monozukuri | Branch: monozukuri | Date: 20 August 2026'
     end
   end
   
@@ -131,7 +131,7 @@ Prawn::Document.generate(pdf_path, page_size: 'A4', margin: [36, 36, 36, 36]) do
   # Step 6
   section_heading(pdf, 'Step 6: Submission Deliverables & Video Walkthrough Guide')
   pdf.font('Helvetica', size: 8.5) do
-    pdf.text '<b>Pull Request GitHub:</b> https://github.com/akmalmzkki25/monozukuri/pull/new/monozukuri', style: :bold, color: '007E88'
+    pdf.text '<b>Pull Request GitHub:</b> https://github.com/akmalgsyk25/monozukuri/pull/new/monozukuri', style: :bold, color: '007E88'
     pdf.text '<b>Branch:</b> monozukuri | <b>Target:</b> main'
     pdf.move_down 4
     pdf.text '<b>Struktur Video Walkthrough (3-5 Menit):</b>', style: :bold
