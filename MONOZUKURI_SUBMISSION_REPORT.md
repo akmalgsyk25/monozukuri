@@ -252,9 +252,11 @@ In accordance with **Indonesia's Personal Data Protection Law (UU PDP No. 27/202
 ## Step 6: Submission Deliverables & Video Walkthrough Guide
 
 ### 1. GitHub Pull Request Details
-- **Repository**: `github.com/rakamindev/ai-interview-platform`
-- **Source Branch**: `feature/monozukuri-revamp`
+- **Fork Repository**: `https://github.com/akmalmzkki25/monozukuri`
+- **Upstream Repository**: `https://github.com/rakamindev/ai-interview-platform`
+- **Active Feature Branch**: `monozukuri`
 - **Target Branch**: `main`
+- **Pull Request Creation Link**: [Create PR on GitHub](https://github.com/akmalmzkki25/monozukuri/pull/new/monozukuri)
 - **PR Title**: `feat(monozukuri): End-to-End AI Talent Intelligence Platform Revamp`
 - **PR Description**: Full architectural summary, screenshots, test execution logs, and trade-off rationales.
 
