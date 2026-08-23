@@ -1,7 +1,7 @@
 # PANDUAN REKAMAN VIDEO DEMONSTRASI (3–5 MENIT)
 ## AI Talent Intelligence Platform — Monozukuri Engineering Revamp
 **Target**: Video Walkthrough untuk submission take-home case study Rakamin (Steps 1–6).  
-**Platform Rekomendasi**: [Loom](https://www.loom.com), YouTube (Unlisted), atau Google Drive.  
+**Platform**: Google Drive.  
 **Durasi**: 3 menit 30 detik s/d 4 menit 30 detik.
 
 ---

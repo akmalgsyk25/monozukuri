@@ -192,7 +192,7 @@ Prawn::Document.generate(pdf_path, page_size: 'A4', margin: [36, 36, 36, 36]) do
   pdf.move_down 14
 
   # Screenshot 4: Portfolio Evidence
-  img4_path = File.join(screenshots_dir, '04_portfolio_evidence.png')
+  img4_path = File.exist?(File.join(screenshots_dir, '04_portfolio.png')) ? File.join(screenshots_dir, '04_portfolio.png') : File.join(screenshots_dir, '04_portfolio_evidence.png')
   if File.exist?(img4_path)
     pdf.font('Helvetica', style: :bold, size: 9) { pdf.text 'Figure 4: Portofolio Kompetensi (Anchor L1-L5 & Kutipan Verbatim Ucapan Kandidat)', color: '0F172A' }
     pdf.image img4_path, fit: [pdf.bounds.width, 230], position: :center

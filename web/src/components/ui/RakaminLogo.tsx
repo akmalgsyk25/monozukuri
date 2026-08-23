@@ -49,10 +49,7 @@ export const RakaminLogo: React.FC<RakaminLogoProps> = ({
         <div className="flex flex-col">
           <div className="flex items-center gap-1.5">
             <span className={cn("font-extrabold tracking-tight text-foreground font-sans", textSizes[size])}>
-              rakamin
-            </span>
-            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase bg-primary/10 text-primary border border-primary/20">
-              AI
+              Rakamin
             </span>
           </div>
           {subtitle && (

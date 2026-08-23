@@ -20,7 +20,7 @@ export const AudioWaveformVisualizer: React.FC<AudioWaveformVisualizerProps> = (
   return (
     <div
       className={cn(
-        "flex items-center justify-center gap-1.5 h-24 px-6 py-3 bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-slate-800/80 shadow-2xl shadow-black/40",
+        "flex items-center justify-center gap-1.5 h-24 px-6 py-3 bg-card/90 backdrop-blur-xl rounded-2xl border border-border/80 shadow-md transition-colors",
         className
       )}
     >
@@ -41,10 +41,10 @@ export const AudioWaveformVisualizer: React.FC<AudioWaveformVisualizerProps> = (
             className={cn(
               "w-1.5 rounded-full transition-all duration-100 ease-out",
               isAiSpeaking
-                ? "bg-gradient-to-t from-blue-600 via-cyan-400 to-teal-300 shadow-[0_0_12px_rgba(34,211,238,0.5)] animate-pulse"
+                ? "bg-gradient-to-t from-primary via-teal-400 to-amber-300 shadow-[0_0_12px_rgba(1,149,159,0.4)] animate-pulse"
                 : isActive
                 ? "bg-gradient-to-t from-emerald-600 via-teal-400 to-green-300 shadow-[0_0_10px_rgba(52,211,153,0.4)]"
-                : "bg-slate-700/50"
+                : "bg-muted-foreground/30"
             )}
             style={{
               height: `${Math.min(72, dynamicHeight)}px`,

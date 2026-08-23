@@ -278,6 +278,7 @@ In accordance with **Indonesia's Personal Data Protection Law (UU PDP No. 27/202
 
 1. **Figure 1: Portal Penilai & Rekruter (Brand Monogram & Dual-Theme Engine)**
    ![Portal Penilai](docs/screenshots/01_login_portal.png)
+   
 
 2. **Figure 2: Candidate Pre-Flight & Hardware Check (VU Meter Mikrofon & Local Speed Test)**
    ![Hardware Check](docs/screenshots/02_hardware_check.png)

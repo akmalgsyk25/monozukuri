@@ -13,34 +13,34 @@ export const AIThoughtIndicator: React.FC<AIThoughtIndicatorProps> = ({ status, 
   const config = {
     listening: {
       label: "Mendengarkan Jawaban Anda...",
-      containerClass: "border-emerald-500/30 bg-emerald-950/30 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.15)]",
-      dotClass: "bg-emerald-400 animate-ping",
-      icon: <Mic className="w-4 h-4 animate-pulse text-emerald-400" />,
+      containerClass: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.15)]",
+      dotClass: "bg-emerald-500 animate-ping",
+      icon: <Mic className="w-4 h-4 animate-pulse text-emerald-600 dark:text-emerald-400" />,
     },
     thinking: {
       label: "AI Sedang Menganalisis Konteks...",
-      containerClass: "border-amber-500/30 bg-amber-950/30 text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.15)]",
-      dotClass: "bg-amber-400 animate-pulse",
-      icon: <Sparkles className="w-4 h-4 animate-spin text-amber-400" />,
+      containerClass: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.15)]",
+      dotClass: "bg-amber-500 animate-pulse",
+      icon: <Sparkles className="w-4 h-4 animate-spin text-amber-600 dark:text-amber-400" />,
     },
     speaking: {
       label: "AI Sedang Menyampaikan Pertanyaan...",
-      containerClass: "border-cyan-500/30 bg-cyan-950/30 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.15)]",
-      dotClass: "bg-cyan-400 animate-bounce",
-      icon: <Volume2 className="w-4 h-4 animate-pulse text-cyan-400" />,
+      containerClass: "border-primary/30 bg-primary/10 text-primary shadow-[0_0_15px_rgba(1,149,159,0.15)]",
+      dotClass: "bg-primary animate-bounce",
+      icon: <Volume2 className="w-4 h-4 animate-pulse text-primary" />,
     },
     idle: {
       label: "Sesi Wawancara Siap",
-      containerClass: "border-slate-700 bg-slate-800/40 text-slate-400",
-      dotClass: "bg-slate-500",
-      icon: <Radio className="w-4 h-4 text-slate-500" />,
+      containerClass: "border-border bg-muted/50 text-muted-foreground",
+      dotClass: "bg-muted-foreground",
+      icon: <Radio className="w-4 h-4 text-muted-foreground" />,
     },
   }[status];
 
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-2.5 px-4 py-2 rounded-full border text-xs font-medium backdrop-blur-md transition-all duration-300",
+        "inline-flex items-center gap-2.5 px-4 py-2 rounded-full border text-xs font-semibold backdrop-blur-md transition-all duration-300 shadow-sm",
         config.containerClass,
         className
       )}

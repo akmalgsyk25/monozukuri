@@ -49,17 +49,27 @@ export default function OverridePanel({ skill, existingOverride, onSaved }: Over
           <>
             <div className="flex items-center gap-1.5 text-xs">
               <LevelBadge level={parseLevel(skill.ai_level)} size="sm" />
-              <span className="text-slate-400 text-[11px]">AI</span>
-              <span className="text-slate-400">→</span>
+              <span className="text-muted-foreground text-[11px]">AI</span>
+              <span className="text-muted-foreground">→</span>
               <LevelBadge level={existingOverride!.override_level} size="sm" />
-              <span className="text-xs text-emerald-400 font-medium ml-1">Overridden ✓</span>
+              <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold ml-1">Overridden ✓</span>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => setOpen(true)} className="text-slate-300 hover:text-white text-xs">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setOpen(true)}
+              className="text-muted-foreground hover:text-foreground hover:bg-muted/60 text-xs rounded-xl"
+            >
               <Pencil className="h-3 w-3 mr-1" /> Edit
             </Button>
           </>
         ) : (
-          <Button variant="outline" size="sm" onClick={() => setOpen(true)} className="border-slate-700 text-slate-300 hover:text-white text-xs">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setOpen(true)}
+            className="border-border/80 bg-background text-muted-foreground hover:text-foreground hover:bg-muted text-xs rounded-xl shadow-sm"
+          >
             Override Rating ▼
           </Button>
         )}
@@ -68,35 +78,49 @@ export default function OverridePanel({ skill, existingOverride, onSaved }: Over
   }
 
   return (
-    <div className="border border-slate-800 rounded-xl p-4 space-y-3 bg-slate-950/60 backdrop-blur-md">
-      <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+    <div className="border border-border/80 rounded-2xl p-4 space-y-3 bg-muted/40 shadow-sm transition-colors duration-200">
+      <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
         Sesuaikan Penilaian Asesor
       </div>
 
       <div className="space-y-1.5">
-        <Label className="text-xs text-slate-300">Tingkat Level Rekomendasi:</Label>
+        <Label className="text-xs font-medium text-foreground">Tingkat Level Rekomendasi:</Label>
         <LevelRadio value={overrideLevel} onChange={setOverrideLevel} />
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor={`notes-${skill.id}`} className="text-xs text-slate-300">Catatan Justifikasi (Opsional):</Label>
+        <Label htmlFor={`notes-${skill.id}`} className="text-xs font-medium text-foreground">
+          Catatan Justifikasi (Opsional):
+        </Label>
         <Textarea
           id={`notes-${skill.id}`}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           rows={3}
           placeholder="Berikan alasan atau konteks penyesuaian nilai..."
-          className="bg-slate-900 border-slate-700 text-xs text-slate-200"
+          className="bg-background border-border text-xs text-foreground placeholder:text-muted-foreground rounded-xl"
         />
       </div>
 
       {saveError && (
-        <p className="text-xs text-red-400">Gagal menyimpan override. Silakan coba lagi.</p>
+        <p className="text-xs text-destructive font-medium">Gagal menyimpan override. Silakan coba lagi.</p>
       )}
 
-      <div className="flex gap-2 justify-end">
-        <Button variant="ghost" size="sm" onClick={() => setOpen(false)} className="text-xs text-slate-400">Batal</Button>
-        <Button size="sm" onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-500 text-white text-xs">
+      <div className="flex gap-2 justify-end pt-1">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setOpen(false)}
+          className="text-xs text-muted-foreground hover:text-foreground rounded-xl"
+        >
+          Batal
+        </Button>
+        <Button
+          size="sm"
+          onClick={handleSave}
+          disabled={saving}
+          className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs rounded-xl shadow-sm active:scale-95 transition-all"
+        >
           {saving && <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />}
           Simpan Penilaian
         </Button>
