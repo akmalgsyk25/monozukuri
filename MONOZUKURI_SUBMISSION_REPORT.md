@@ -262,7 +262,13 @@ In accordance with **Indonesia's Personal Data Protection Law (UU PDP No. 27/202
 
 ---
 
-### 2. Video Demonstration Script & Outline (3–5 Minutes)
+### 2. Video Walkthrough & Demonstration Link
+
+- **Direct Video Demonstration URL**: [Watch Full Video Walkthrough on Google Drive](https://drive.google.com/drive/folders/19_2FUWJDyjjmZsbTGJc2g_Y_EGfWrNqD?usp=sharing)
+- **Google Drive Folder**: `https://drive.google.com/drive/folders/19_2FUWJDyjjmZsbTGJc2g_Y_EGfWrNqD?usp=sharing`
+- **Video Duration**: 3–5 Minutes (Comprehensive End-to-End Walkthrough)
+
+#### Video Demonstration Script & Outline:
 
 | Timeline | Scene / Screen | Narration & Key Demonstration Points |
 | :--- | :--- | :--- |
