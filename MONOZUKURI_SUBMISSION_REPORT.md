@@ -101,16 +101,7 @@ Candidates have no choice in using the platform. A flawed AI decision or broken 
 
 ### Technical Option Evaluation Matrix
 
-```mermaid
-graph TD
-    A[Revamp Strategies Evaluated] --> B[Option A: Ad-Hoc Hotfixing]
-    A --> C[Option B: Monozukuri Fullstack Pivot - SELECTED]
-    A --> C2[Option C: Microservices Separation]
-    
-    B --> B1[Low Cost, High Long-term Fragility]
-    C --> C1[Balanced Cost, High Reliability, Robust UX]
-    C2 --> C3[Extreme Complexity, High Ops Overhead]
-```
+![Technical Option Evaluation Tree](docs/diagrams/strategy_evaluation_tree.png)
 
 | Evaluation Dimension | Option A: Ad-Hoc Hotfixing | Option B: Monozukuri Fullstack Revamp (Selected) | Option C: Python Microservices Extraction |
 | :--- | :--- | :--- | :--- |
@@ -140,33 +131,7 @@ graph TD
 
 ### Architectural Design & Data Flow
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Candidate
-    participant Web as React 18 SPA (Vite)
-    participant Rails as Rails 7 API
-    participant GeminiWS as Gemini Live (v1alpha)
-    participant Sidekiq as Sidekiq Worker Queue
-    participant GeminiREST as Gemini Pro (v1beta)
-    participant Recruiter as Assessor / Recruiter
-
-    Candidate->>Web: Start Interview Session
-    Web->>Rails: WebSocket Connection (/cable)
-    Rails->>GeminiWS: BidiGenerateContent Handshake (gemini-2.5-flash-native-audio-latest)
-    GeminiWS-->>Rails: setupComplete { }
-    Note over Candidate,GeminiWS: Real-time Audio Exchange & Waveform Streaming
-    Candidate->>Web: Finish Interview
-    Web->>Rails: Complete Session
-    Rails->>Sidekiq: Enqueue PortfolioGeneratorWorker
-    Sidekiq->>GeminiREST: Evaluate Transcript & Behavioral Anchors (gemini-3.1-pro-preview)
-    GeminiREST-->>Sidekiq: Structured Evidence JSON
-    Sidekiq->>Rails: Save PortfolioSkills & Evidence Quotes
-    Recruiter->>Web: Open Candidate Portfolio
-    Web->>Rails: GET /api/v1/sessions/:id/portfolio
-    Recruiter->>Web: Trigger Fit/Gap & Download PDF
-    Rails->>Web: Stream Prawn-generated PDF Dossier
-```
+![Architectural Design & Data Flow](docs/diagrams/architectural_sequence_flow.png)
 
 ---
 
