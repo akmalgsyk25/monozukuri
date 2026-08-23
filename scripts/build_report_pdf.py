@@ -46,8 +46,27 @@ def close_all_lists():
         res.append(f"</{tag}>")
     return res
 
+in_mermaid = False
+mermaid_kind = ""
+
 for line in lines:
     raw_stripped = line.strip()
+
+    # Mermaid diagram mapping to docs/diagrams
+    if raw_stripped.startswith("```mermaid"):
+        in_mermaid = True
+        mermaid_kind = "tree" if len(html_parts) < 160 else "sequence"
+        continue
+    elif in_mermaid:
+        if raw_stripped.startswith("```"):
+            in_mermaid = False
+            img_rel = "docs/diagrams/strategy_evaluation_tree.png" if mermaid_kind == "tree" else "docs/diagrams/architectural_sequence_flow.png"
+            full_img_path = os.path.normpath(os.path.join(ROOT_DIR, img_rel))
+            if os.path.exists(full_img_path):
+                with open(full_img_path, "rb") as f_img:
+                    enc = base64.b64encode(f_img.read()).decode("utf-8")
+                html_parts.append(f'<div class="diagram-box"><img src="data:image/png;base64,{enc}" alt="Diagram" class="diagram-img" /></div>')
+        continue
 
     # Code blocks
     if raw_stripped.startswith("```"):
