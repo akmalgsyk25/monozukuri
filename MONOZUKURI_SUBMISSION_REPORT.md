@@ -126,7 +126,7 @@ graph TD
    - Must NOT crash Fit/Gap calculations.
    - Status marked explicitly as `not_assessed` with a dedicated neutral badge and `gap = 0`.
 2. **Markdown Code Fence in LLM Output**:
-   - Resilient parser strips ```json fences and extracts pure JSON payload seamlessly.
+   - Resilient parser strips markdown code fences (e.g. ```` ```json ````) and extracts pure JSON payload seamlessly.
 3. **Assessor Overrides**:
    - Updating a skill level automatically recalculates Fit/Gap deltas and updates the audit trail (`overridden_by`, `overridden_at`, `assessor_notes`).
 4. **Idempotency & Concurrent Retries**:
