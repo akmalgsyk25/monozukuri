@@ -274,23 +274,37 @@ In accordance with **Indonesia's Personal Data Protection Law (UU PDP No. 27/202
 
 ---
 
-### 3. Visual Screenshot Showcase (Included in Submission PDF)
+### 3. Visual Screenshot Showcase (End-to-End User Flow Gallery)
 
 1. **Figure 1: Portal Penilai & Rekruter (Brand Monogram & Dual-Theme Engine)**
    ![Portal Penilai](docs/screenshots/01_login_portal.png)
-   
 
-2. **Figure 2: Candidate Pre-Flight & Hardware Check (VU Meter Mikrofon & Local Speed Test)**
+2. **Figure 2: Dashboard Daftar Asesmen & Manajemen Sesi Wawancara**
+   ![Daftar Asesmen](docs/screenshots/01_list_interview.png)
+
+3. **Figure 3: Konfigurasi Standar Kompetensi & Anchor Perilaku L1–L5**
+   ![Konfigurasi Asesmen](docs/screenshots/02_set_assesment.png)
+
+4. **Figure 4: Pembuatan Tautan Undangan Wawancara Kandidat**
+   ![Link Undangan](docs/screenshots/02_link_invitation.png)
+
+5. **Figure 5: Candidate Pre-Flight & Hardware Check (VU Meter Mikrofon & Local Speed Test)**
    ![Hardware Check](docs/screenshots/02_hardware_check.png)
 
-3. **Figure 3: Ruang Wawancara Suara Live (Waveform Audio Visualizer & State Indicators)**
+6. **Figure 6: Ruang Wawancara Suara Live AI (Waveform Audio Visualizer & Turn Indicators)**
    ![Live Interview](docs/screenshots/03_live_interview.png)
 
-4. **Figure 4: Candidate Portfolio Dashboard (Anchor L1–L5 & Kutipan Verbatim Ucapan Kandidat)**
-   ![Portofolio Kompetensi](docs/screenshots/04_portfolio_evidence.png)
+7. **Figure 7: Modal Konfirmasi Penyelesaian Sesi Wawancara & Proteksi UU PDP**
+   ![End Interview Modal](docs/screenshots/02_end_interview.png)
 
-5. **Figure 5: Role Fit/Gap Comparison View & Executive PDF Export Dossier**
-   ![Fit/Gap Report](docs/screenshots/05_fitgap_export.png)
+8. **Figure 8: Layar Selesai Wawancara Kandidat (Session Completion State)**
+   ![Final Interview](docs/screenshots/02_final_interview.png)
+
+9. **Figure 9: Portofolio Kompetensi Kandidat (Anchor L1–L5 & Kutipan Verbatim Ucapan Kandidat)**
+   ![Portofolio Kompetensi](docs/screenshots/04_portfolio.png)
+
+10. **Figure 10: Fit/Gap Role Matching Matrix, Rekomendasi Budaya, & Ekspor PDF Dossier**
+    ![Fit/Gap Report](docs/screenshots/05_fitgap_export.png)
 
 ---
 
