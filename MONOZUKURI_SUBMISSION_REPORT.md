@@ -1,10 +1,11 @@
 # MONOZUKURI PRODUCT & ENGINEERING SUBMISSION REPORT
 ## AI-Powered Talent Assessment & Skill Intelligence Platform
 **Case Study: Fullstack Product Engineer**  
-**Applicant / Author:** Product Engineering Candidate  
-**Target Repository:** `github.com/rakamindev/ai-interview-platform`  
-**Feature Branch:** `feature/monozukuri-revamp`  
-**Submission Date:** 19 August 2026  
+**Nama:** Akmal Muzakki Bakir  
+**Repository:** [akmalgsyk25/monozukuri: Quality Engineer case study: a two-service platform (api + web) that candidates assess, harden, and release.](https://github.com/akmalgsyk25/monozukuri)  
+**Target Upstream:** `github.com/rakamindev/ai-interview-platform`  
+**Feature Branch:** `monozukuri`  
+**Submission Date:** 24 August 2026  
 
 ---
 
@@ -115,7 +116,7 @@ graph TD
 | Evaluation Dimension | Option A: Ad-Hoc Hotfixing | Option B: Monozukuri Fullstack Revamp (Selected) | Option C: Python Microservices Extraction |
 | :--- | :--- | :--- | :--- |
 | **Product Impact** | Low. Fixes connection but leaves scoring brittle and un-auditable. | **Maximum**. Transforms entire pipeline into a resilient, evidence-backed dossier. | Moderate. Improves AI processing but introduces network hops and latency. |
-| **Engineering Cost** | 1 day. | **3 days** (Well within brief deadline). | 2+ weeks (Requires separate deployment pipelines). |
+| **Engineering Cost** | 1 day. | **3 days**. | 2+ weeks (Requires separate deployment pipelines). |
 | **Maintainability** | Poor. Tech debt remains in Rails and React codebases. | **High**. Idiomatic Rails services, clean TypeScript interfaces, 100% test coverage. | Complex. Distributed tracing and dual-stack maintenance required. |
 | **Failure Modes** | Silent failures on unassessed skills and malformed JSON. | Explicit failure states, graceful UI fallback, and retry queues. | Distributed network timeouts and sync issues. |
 | **Contextual Fit** | Unacceptable for Monozukuri standards. | **Optimal**. Delivers top-notch UX and uncompromised system rigor. | Over-engineered for current organizational stage. |

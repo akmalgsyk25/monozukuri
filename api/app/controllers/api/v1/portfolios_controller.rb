@@ -10,16 +10,16 @@ module Api
 
       # GET /api/v1/sessions/:id/portfolio
       def show
-        if @portfolio.nil? || @portfolio.pending?
-          Portfolios::Generator.new(session: @session).call
+        if (@portfolio.nil? || @portfolio.pending?) && Rails.env.development? && @session&.transcript_turns&.exists?
+          Portfolios::Generator.new(session: @session).call rescue nil
           @portfolio = @session.reload.portfolio
         end
 
-        if @portfolio&.generating?
+        if @portfolio.nil? || @portfolio.generating?
           return render json: { status: "generating" }, status: :accepted
         end
 
-        if @portfolio&.failed?
+        if @portfolio.failed?
           return json_response(
             portfolio: portfolio_json(@portfolio),
             error: @portfolio.generation_error
