@@ -17,6 +17,15 @@ class Rack::Attack
     req.ip if req.path.match?(%r{\A/api/v1/sessions/[^/]+/(candidate|audio_complete)\z})
   end
 
+  # Throttle the pre-check probe. One run is 4 counted requests, and candidates
+  # behind a shared campus/office/carrier NAT start together, so the limit is
+  # generous; with downloads capped at 256 KB it still bounds an IP to ~30 MB/min.
+  # The pattern also catches the `.json` format suffix and trailing slashes,
+  # both of which Rails routes to the same action.
+  throttle('candidate/speed_test', limit: 120, period: 1.minute) do |req|
+    req.ip if req.path.match?(%r{\A/api/v1/speed_test(\.\w+)?/*\z})
+  end
+
   # Return 429 JSON instead of the default plain-text response.
   self.throttled_responder = lambda do |_req|
     [

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { testInternetSpeed, DEFAULT_THRESHOLDS, type InternetSpeedResult } from "@/utils/internetSpeedTest";
+import { testInternetSpeed, DEFAULT_THRESHOLDS, formatNumber, type InternetSpeedResult } from "@/utils/internetSpeedTest";
 import {
     ProctoringState,
     type HardwareCheckingProgress,
@@ -30,6 +30,15 @@ function stateLabel(state: ProctoringState) {
     if (state === ProctoringState.PASSED) return "Lolos";
     if (state === ProctoringState.ERROR) return "Gagal";
     return "Menunggu";
+}
+
+// A null value was not measured (the probe timed out), so it shows as a dash.
+function SpeedFigure({ label, unit, value, ok }: { label: string; unit: string; value: number | null; ok: boolean }) {
+    return (
+        <span className={ok ? "text-emerald-600 dark:text-emerald-400 font-medium" : "text-destructive font-medium"}>
+            {label}{value === null ? "—" : formatNumber(value)} {unit}
+        </span>
+    );
 }
 
 const REQUIRE_CAMERA = import.meta.env.VITE_REQUIRE_CAMERA === "true";
@@ -115,17 +124,14 @@ const HardwareCheck: React.FC<HardwareCheckProps> = ({ onStart }) => {
             osAndBrowser: osPassed ? ProctoringState.PASSED : ProctoringState.ERROR,
         }));
 
-        // 2. Internet Speed
+        // 2. Internet Speed (clear the previous result so stale reasons don't sit next to the spinner)
+        setInternetResult(null);
         setProgress((prev) => ({ ...prev, internet: ProctoringState.LOADING }));
-        const speed = await testInternetSpeed();
+        const speed = await testInternetSpeed(thresholds);
         setInternetResult(speed);
-        const internetPassed =
-            speed.download >= thresholds.minDownloadMbps &&
-            speed.upload >= thresholds.minUploadMbps &&
-            speed.ping <= thresholds.maxPingMs;
         setProgress((prev) => ({
             ...prev,
-            internet: internetPassed ? ProctoringState.PASSED : ProctoringState.ERROR,
+            internet: speed.passed ? ProctoringState.PASSED : ProctoringState.ERROR,
         }));
 
         // 3. Camera
@@ -182,7 +188,7 @@ const HardwareCheck: React.FC<HardwareCheckProps> = ({ onStart }) => {
 
     const rows: { key: keyof HardwareCheckingProgress; label: string; desc: string }[] = [
         { key: "osAndBrowser", label: "Sistem Operasi & Browser", desc: "Verifikasi kompatibilitas web platform" },
-        { key: "internet", label: "Koneksi Jaringan Internet", desc: "Kecepatan download & latensi audio" },
+        { key: "internet", label: "Koneksi Jaringan Internet", desc: "Unduh, unggah & latensi ke server wawancara" },
         ...(REQUIRE_CAMERA ? [{ key: "camera" as const, label: "Kamera Video", desc: "Uji akses video stream" }] : []),
         { key: "microphone", label: "Mikrofon / Input Suara", desc: "Uji tangkapan gelombang suara mikrofon" },
         { key: "audio", label: "Speaker / Output Audio", desc: "Uji pemutaran suara asisten AI" },
@@ -201,18 +207,36 @@ const HardwareCheck: React.FC<HardwareCheckProps> = ({ onStart }) => {
                             <p className="text-[11px] text-muted-foreground">{desc}</p>
 
                             {/* Internet speed details */}
-                            {key === "internet" && internetResult && (
+                            {key === "internet" && internetResult && !internetResult.error && (
                                 <div className="mt-1.5 flex gap-3 text-xs">
-                                    <span className={internetResult.download >= thresholds.minDownloadMbps ? "text-emerald-600 dark:text-emerald-400 font-medium" : "text-destructive font-medium"}>
-                                        ↓ {internetResult.download} Mbps
-                                    </span>
-                                    <span className={internetResult.upload >= thresholds.minUploadMbps ? "text-emerald-600 dark:text-emerald-400 font-medium" : "text-destructive font-medium"}>
-                                        ↑ {internetResult.upload} Mbps
-                                    </span>
-                                    <span className={internetResult.ping <= thresholds.maxPingMs ? "text-emerald-600 dark:text-emerald-400 font-medium" : "text-destructive font-medium"}>
-                                        {internetResult.ping} ms
-                                    </span>
+                                    <SpeedFigure
+                                        label="↓ "
+                                        unit="Mbps"
+                                        value={internetResult.download}
+                                        ok={internetResult.download !== null && internetResult.download >= thresholds.minDownloadMbps}
+                                    />
+                                    <SpeedFigure
+                                        label="↑ "
+                                        unit="Mbps"
+                                        value={internetResult.upload}
+                                        ok={internetResult.upload !== null && internetResult.upload >= thresholds.minUploadMbps}
+                                    />
+                                    <SpeedFigure
+                                        label=""
+                                        unit="ms"
+                                        value={internetResult.ping}
+                                        ok={internetResult.ping !== null && internetResult.ping <= thresholds.maxPingMs}
+                                    />
                                 </div>
+                            )}
+
+                            {/* Why the internet check failed, so the candidate knows what to fix */}
+                            {key === "internet" && internetResult && !internetResult.passed && (
+                                <ul className="mt-1 text-[11px] text-destructive space-y-0.5">
+                                    {(internetResult.error ? [internetResult.error] : internetResult.failures).map((reason) => (
+                                        <li key={reason}>{reason}</li>
+                                    ))}
+                                </ul>
                             )}
 
                             {/* Mic level bar */}
