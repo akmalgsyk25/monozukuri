@@ -20,6 +20,14 @@ module Portfolios
         generation_status: 'pending'
       )
 
+      # A duplicate enqueue or a Sidekiq redelivery must not rebuild a finished portfolio:
+      # destroying its skills would cascade to the assessors' overrides. Regeneration is
+      # only allowed from 'failed', and the controller resets that to 'pending' first.
+      if portfolio.complete?
+        Rails.logger.info("[N10] Portfolio for session #{@session.id} already complete, skipping")
+        return portfolio
+      end
+
       portfolio.update!(generation_status: 'generating')
 
       prompt   = build_prompt
