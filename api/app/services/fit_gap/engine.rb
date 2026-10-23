@@ -154,8 +154,13 @@ module FitGap
       gaps    = comparisons.count { |c| c[:result] == 'gap' }
       matches = comparisons.count { |c| c[:result] == 'match' }
       exceeds = comparisons.count { |c| c[:result] == 'exceed' }
+      not_assessed = comparisons.count { |c| c[:result] == 'not_assessed' }
 
-      "Candidate shows #{matches} skill matches, #{exceeds} exceeds, and #{gaps} gaps against role requirements."
+      summary = "Candidate shows #{matches} skill matches, #{exceeds} exceeds, and #{gaps} gaps against role requirements."
+      return summary if not_assessed.zero?
+
+      # Unassessed skills carry no level, so they are reported separately rather than counted as gaps.
+      "#{summary} #{not_assessed} required skill(s) were not assessed in the interview and need follow-up before a decision."
     end
   end
 end
