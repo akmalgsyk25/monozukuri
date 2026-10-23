@@ -38,7 +38,7 @@ module Gemini
     private
 
     def generate_url
-      "#{BASE_URL}/models/#{@model}:generateContent?key=#{@api_key}"
+      "#{BASE_URL}/models/#{@model}:generateContent"
     end
 
     def request_headers

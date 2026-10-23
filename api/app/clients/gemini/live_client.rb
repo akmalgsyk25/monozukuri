@@ -63,12 +63,11 @@ module Gemini
     # Opens the WebSocket and sends setup; resumes a prior session if a handle is provided.
     def connect(resumption_handle: nil)
       @setup_complete = false
-      ws_url = "#{GEMINI_WS_URL}?key=#{@api_key}"
       headers = { 'x-goog-api-key' => @api_key }
       headers['Authorization'] = "Bearer #{@api_key}" if @api_key.to_s.start_with?('AQ.', 'ya29.')
 
       @ws = Faye::WebSocket::Client.new(
-        ws_url,
+        GEMINI_WS_URL,
         nil,
         headers: headers
       )
@@ -289,11 +288,11 @@ module Gemini
         parts << 'audio' if has_audio
         if has_input_tx
           input_tx_text = sc.dig('inputTranscription', 'parts', 0, 'text') || sc.dig('inputTranscription', 'text')
-          parts << "inputTx=#{input_tx_text.truncate(50)}" if input_tx_text.present?
+          parts << "inputTx=#{input_tx_text.length}chars" if input_tx_text.present?
         end
         if has_output_tx
           output_tx_text = sc.dig('outputTranscription', 'parts', 0, 'text') || sc.dig('outputTranscription', 'text')
-          parts << "outputTx=#{output_tx_text.truncate(50)}" if output_tx_text.present?
+          parts << "outputTx=#{output_tx_text.length}chars" if output_tx_text.present?
         end
         parts << 'turnComplete' if turn_complete
         parts << 'generationComplete' if gen_complete
