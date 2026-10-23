@@ -9,6 +9,10 @@ class Portfolio < ApplicationRecord
 
   validates :generation_status, inclusion: { in: GENERATION_STATUSES }
 
+  # Portfolios have no tenant_id; they belong to a tenant through their session,
+  # and Session's TenantScoped default scope limits this subquery to Current.tenant_id.
+  scope :in_current_tenant, -> { where(session_id: Session.select(:id)) }
+
   scope :pending,     -> { where(generation_status: 'pending') }
   scope :complete,    -> { where(generation_status: 'complete') }
   scope :failed,      -> { where(generation_status: 'failed') }
