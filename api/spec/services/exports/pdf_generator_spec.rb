@@ -46,4 +46,28 @@ RSpec.describe Exports::PdfGenerator do
     expect(pdf_data).to be_present
     expect(pdf_data.start_with?("%PDF-")).to be true
   end
+
+  context "when text falls outside the built-in font's character set" do
+    before do
+      skill = portfolio.portfolio_skills.first
+      skill.update!(
+        competency_summary: "Explains trade-offs → picks the safer rollout 🚀",
+        evidence: ["Saya pakai cgroup → limit memori 内存"]
+      )
+      AssessorOverride.create!(portfolio_skill: skill, ai_level: 4, override_level: 3,
+                               overridden_by: user.id, assessor_notes: "Kurang dalam → tuning ✅")
+      FitGapReport.create!(
+        portfolio: portfolio, vacancy: vacancy, generated_at: Time.current,
+        skill_comparisons: [{ skill_label: "Linux Systems", expected_level: 4, candidate_level: 3,
+                              result: "gap", delta: -1 }],
+        overall_narrative: "Strong fit → recommend 👍"
+      )
+    end
+
+    it "exports an overridden skill and LLM text with arrows, emoji and CJK instead of raising" do
+      pdf_data = described_class.new(portfolio: portfolio.reload, vacancy: vacancy).call
+
+      expect(pdf_data.start_with?("%PDF-")).to be true
+    end
+  end
 end

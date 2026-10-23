@@ -110,8 +110,10 @@ RSpec.describe Portfolios::Generator do
       allow(mock_gemini).to receive(:generate_content).and_return(valid_response)
       generator = described_class.new(session: session, gemini_client: mock_gemini)
 
-      generator.call
       portfolio = generator.call
+      # Same path as POST /portfolio/regenerate, which resets status before re-enqueueing.
+      portfolio.update!(generation_status: 'pending')
+      described_class.new(session: session.reload, gemini_client: mock_gemini).call
 
       expect(PortfolioSkill.where(portfolio_id: portfolio.id).count).to eq(1)
     end
@@ -120,6 +122,7 @@ RSpec.describe Portfolios::Generator do
       allow(mock_gemini).to receive(:generate_content).and_return(valid_response)
       portfolio = described_class.new(session: session, gemini_client: mock_gemini).call
       previous_ids = PortfolioSkill.where(portfolio_id: portfolio.id).pluck(:id)
+      portfolio.update!(generation_status: 'pending')
 
       # Second skill has no competency_summary, so its insert fails after the first one succeeded.
       partial_response = valid_response.merge(
@@ -135,6 +138,23 @@ RSpec.describe Portfolios::Generator do
 
       expect(PortfolioSkill.where(portfolio_id: portfolio.id).pluck(:id)).to match_array(previous_ids)
       expect(portfolio.reload.generation_status).to eq('failed')
+    end
+  end
+
+  context "when the job runs again for a portfolio that is already complete" do
+    it "leaves the skills and the assessor's override untouched and does not call Gemini" do
+      portfolio = session.create_portfolio!(generation_status: 'complete')
+      skill = portfolio.portfolio_skills.create!(skill_id: "sk-fe-001", skill_label: "React Hooks", ai_level: 3,
+                                                 ai_confidence: "high", competency_summary: "Solid hook usage.")
+      override = AssessorOverride.create!(portfolio_skill: skill, ai_level: 3, override_level: 2,
+                                          overridden_by: user.id, assessor_notes: "Could not explain cleanup.")
+      allow(mock_gemini).to receive(:generate_content)
+
+      described_class.new(session: session.reload, gemini_client: mock_gemini).call
+
+      expect(mock_gemini).not_to have_received(:generate_content)
+      expect(AssessorOverride.exists?(override.id)).to be true
+      expect(PortfolioSkill.where(portfolio_id: portfolio.id).pluck(:id)).to eq([skill.id])
     end
   end
 
