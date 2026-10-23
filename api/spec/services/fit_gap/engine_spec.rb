@@ -98,5 +98,31 @@ RSpec.describe FitGap::Engine do
       expect(report.culture_narrative).to be_nil
       expect(report.overall_narrative).to include("Candidate shows")
     end
+
+    it "reports unassessed skills separately instead of counting them as gaps" do
+      report = described_class.new(portfolio: portfolio, vacancy: vacancy, gemini_client: mock_gemini).call
+
+      expect(report.overall_narrative).to include("1 skill matches")
+      expect(report.overall_narrative).to include("0 gaps")
+      expect(report.overall_narrative).to include("2 required skill(s) were not assessed")
+    end
+  end
+
+  context "when an assessor overrides an AI level" do
+    before do
+      allow(mock_gemini).to receive(:generate_content).and_raise(StandardError.new("Service timeout"))
+      rails_skill = portfolio.portfolio_skills.find_by(skill_id: "sk-01")
+      AssessorOverride.create!(portfolio_skill: rails_skill, ai_level: 4, override_level: 2, overridden_by: user.id, assessor_notes: "Answers were memorised, not applied.")
+    end
+
+    it "uses the override level for the delta and flags the comparison" do
+      report = described_class.new(portfolio: portfolio, vacancy: vacancy, gemini_client: mock_gemini).call
+
+      rails_comp = report.skill_comparisons.find { |c| c['skill_label'] == 'Ruby on Rails' }
+      expect(rails_comp['candidate_level']).to eq(2)
+      expect(rails_comp['result']).to eq('gap')
+      expect(rails_comp['delta']).to eq(-1)
+      expect(rails_comp['is_override']).to be(true)
+    end
   end
 end

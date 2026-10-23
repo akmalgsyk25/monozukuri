@@ -95,6 +95,49 @@ RSpec.describe Portfolios::Generator do
     end
   end
 
+  context "when the portfolio is regenerated" do
+    let(:valid_response) do
+      {
+        "configured_skills" => [
+          { "skill_id" => "sk-fe-001", "skill_label" => "React Hooks", "level" => 3, "confidence" => "high",
+            "evidence" => ["I use useEffect."], "competency_summary" => "Solid hook usage." }
+        ],
+        "discovered_skills" => []
+      }
+    end
+
+    it "replaces skills instead of duplicating them on repeated runs" do
+      allow(mock_gemini).to receive(:generate_content).and_return(valid_response)
+      generator = described_class.new(session: session, gemini_client: mock_gemini)
+
+      generator.call
+      portfolio = generator.call
+
+      expect(PortfolioSkill.where(portfolio_id: portfolio.id).count).to eq(1)
+    end
+
+    it "keeps the previous skills when a skill row fails mid-write" do
+      allow(mock_gemini).to receive(:generate_content).and_return(valid_response)
+      portfolio = described_class.new(session: session, gemini_client: mock_gemini).call
+      previous_ids = PortfolioSkill.where(portfolio_id: portfolio.id).pluck(:id)
+
+      # Second skill has no competency_summary, so its insert fails after the first one succeeded.
+      partial_response = valid_response.merge(
+        "configured_skills" => valid_response["configured_skills"] + [
+          { "skill_id" => "sk-fe-002", "skill_label" => "State Management", "level" => 2, "confidence" => "low",
+            "evidence" => [], "competency_summary" => nil }
+        ]
+      )
+      allow(mock_gemini).to receive(:generate_content).and_return(partial_response)
+
+      expect { described_class.new(session: session.reload, gemini_client: mock_gemini).call }
+        .to raise_error(ActiveRecord::RecordInvalid)
+
+      expect(PortfolioSkill.where(portfolio_id: portfolio.id).pluck(:id)).to match_array(previous_ids)
+      expect(portfolio.reload.generation_status).to eq('failed')
+    end
+  end
+
   context "when Gemini call raises an error" do
     before do
       allow(mock_gemini).to receive(:generate_content).and_raise(StandardError.new("API rate limit exceeded"))
