@@ -5,7 +5,7 @@
 **Repository:** [akmalgsyk25/monozukuri: Quality Engineer case study: a two-service platform (api + web) that candidates assess, harden, and release.](https://github.com/akmalgsyk25/monozukuri)  
 **Target Upstream:** `github.com/rakamindev/ai-interview-platform`  
 **Feature Branch:** `monozukuri`  
-**Pull Request:** <!-- PR_URL --> `https://github.com/rakamindev/ai-interview-platform/pull/<number>` (base: `main`)  
+**Pull Request:** [https://github.com/rakamindev/ai-interview-platform/pull/184](https://github.com/rakamindev/ai-interview-platform/pull/184) (base: `main`)  
 **Submission Date:** 24 August 2026 · **Revised:** 25 October 2026  
 
 > **Revision notes (October 2026), responding to reviewer feedback:**
@@ -347,7 +347,7 @@ These came out of the worst-case review. They need either a product decision or 
 ## Step 6: Submission Deliverables & Video Walkthrough Guide
 
 ### 1. GitHub Pull Request (Option A: single comprehensive PR)
-- **Pull Request URL**: <!-- PR_URL --> `https://github.com/rakamindev/ai-interview-platform/pull/<number>`
+- **Pull Request URL**: [https://github.com/rakamindev/ai-interview-platform/pull/184](https://github.com/rakamindev/ai-interview-platform/pull/184)
 - **Base**: `rakamindev/ai-interview-platform` → `main`
 - **Head**: `akmalgsyk25/monozukuri` → `monozukuri`
 - **PR Title**: `feat: fullstack revamp of interview, portfolio evidence and Fit/Gap (api + web + tests)`
