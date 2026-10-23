@@ -14,6 +14,8 @@
 > 3. A new section, *Engineering Focus: Backend-Weighted*, explains why the solution leans on the backend.
 > 4. The Options Matrix now separates **Failure Modes** (what breaks) from **Mitigation** (how the selected option handles it).
 > 5. The generic rejection reason was replaced with the specific product, deadline, latency and ownership constraints behind rejecting Options A and C.
+>
+> While revising, I re-audited the branch for security and failure paths and fixed what I found: cross-tenant access to portfolios, a PDF export crash on overridden skills, overrides being wiped by a re-run job, the Gemini key in request URLs, transcript text in logs, and hardcoded credentials and personal data in seeds/config. Each fix has a spec that fails without it. AC 5 was also corrected: the silence pump already existed upstream, so it is no longer claimed as my work. What I did not fix is listed under **Known Limitations**.
 
 ---
 
@@ -22,10 +24,10 @@
 This document presents the end-to-end product transformation and engineering revamp of the **Rakamin AI Interview Platform**. Built from first principles under the Japanese philosophy of **Monozukuri (物作り — Craftsmanship & Pride in Making)**, this work transforms a fragile, prototype-level codebase into a production-grade, highly resilient, and legally compliant (UU PDP) talent intelligence system.
 
 ### Key Milestones Delivered:
-1. **Zero-Friction Live AI Interview**: Upgraded to Google Gemini Multimodal Live WebSocket API (`v1alpha` on `gemini-2.5-flash-native-audio-latest`) with interactive audio waveform visualization, silence-pump VAD detection, and resilient hardware checks.
+1. **Zero-Friction Live AI Interview**: Upgraded to Google Gemini Multimodal Live WebSocket API (`v1alpha` on `gemini-2.5-flash-native-audio-latest`) with interactive audio waveform visualization and a candidate hardware check, keeping the existing silence-pump turn detection working.
 2. **Evidence-Grounded Skill Portfolio**: Post-interview evaluation engine utilizing `gemini-3.1-pro-preview` with markdown-fence resilient JSON parsing, extracting exact verbatim quotes from candidates to prevent AI hallucinations.
 3. **Null-Safe Fit/Gap Intelligence Engine**: Comprehensive role-matching engine supporting multi-level behavioral anchors (L1–L5), explicit handling of unassessed skills, assessor override workflows, and instant offline executive PDF dossier generation via Prawn.
-4. **Verified Test Harness**: Built an RSpec suite from zero (**29 examples, 0 failures**) and added a Vitest runner to the web app (**12 tests, 0 failures**), covering failure paths, partial-write rollback, regeneration idempotency, and edge-case data safety.
+4. **Verified Test Harness**: Built an RSpec suite from zero (**34 examples, 0 failures**) and added a Vitest runner to the web app (**12 tests, 0 failures**), covering failure paths, partial-write rollback, regeneration idempotency, and edge-case data safety.
 
 ---
 
@@ -40,6 +42,7 @@ This document presents the end-to-end product transformation and engineering rev
    - [Seeded Fault Test Proof](#seeded-fault-test-proof)
    - [AI Verification Moment](#ai-verification-moment)
    - [Protected Data & Indonesian UU PDP Compliance](#protected-data--indonesian-uu-pdp-compliance)
+   - [Known Limitations (Not Fixed in This PR)](#known-limitations-not-fixed-in-this-pr)
 6. [Step 6: Submission Deliverables & Video Walkthrough Guide](#step-6-submission-deliverables--video-walkthrough-guide)
 
 ---
@@ -82,7 +85,7 @@ The system exists to provide every candidate—regardless of university prestige
 Candidates have no choice in using the platform. A flawed AI decision or broken connection can derail a person's career.
 - **Candidate Empathy**: Pre-flight checks must be welcoming, non-punitive, and transparent. Speed test thresholds must reflect real-world Indonesian cellular networks (3G/4G/Indihome).
 - **UU PDP (Undang-Undang Perlindungan Data Pribadi No. 27/2022) Compliance**:
-  - *Data Minimization*: Audio is processed in ephemeral memory and not permanently retained on third-party servers.
+  - *Data Minimization*: This service does not persist raw audio; it relays audio to Gemini Live and stores only the transcript. (Retention on Google's side follows the Gemini API terms.)
   - *Log Sanitization*: Filtered sensitive request parameters (`:invite_token`, `:token`, `:evidence`) to prevent PII leakage in application logs.
   - *Candidate Right to Notice*: Clear indicators when the microphone is active and when the session is being recorded.
 
@@ -102,7 +105,9 @@ Candidates have no choice in using the platform. A flawed AI decision or broken 
 | **GAP-08** | **P3** | Missing Specification | Inability to export candidate competency portfolios to executive PDF / JSON. | Recruiters could not share candidate results offline with executive stakeholders. |
 
 ### Technical Lead Constraint Signal
-> **Architectural Escalation**: Bidirectional WebSocket audio streaming introduces external dependency risks (Google Gemini latency, network packet loss, and potential API version deprecation). We implemented a decoupled worker architecture with explicit fallback models, keepalive EventMachine timers, and idempotent Sidekiq background jobs to isolate WebSocket failures from core database operations.
+> **Architectural Escalation**: Bidirectional WebSocket audio streaming introduces external dependency risks (Google Gemini latency, network packet loss, and potential API version deprecation). In this PR the Gemini model names come from ENV (`GEMINI_LIVE_MODEL`, `GEMINI_PRO_MODEL`, `GEMINI_FLASH_MODEL`), so a model deprecation is a config change rather than a deploy. The endpoint version is still a constant. Post-interview evaluation runs in idempotent Sidekiq jobs, outside the WebSocket path. The reconnect logic is upstream code that I kept; its remaining gaps (reconnect during the grace window, no setup timeout, no EventMachine error handler) are listed under Known Limitations.
+
+> **Escalation: tenant model (found during revision).** `Portfolio`, `PortfolioSkill`, `FitGapReport` and `AssessorOverride` have no `tenant_id`. Only `Session`, `Assessment` and `Vacancy` are tenant-scoped, so lookups by id on the first group were unscoped and any assessor could read or override another organization's candidate. I closed this in the controllers by resolving those records through the tenant-scoped session (with request specs). The root cause needs a Tech Lead decision, though: login (`authentication_controller.rb`, unchanged upstream code) takes the tenant from the client-supplied `X-Tenant-Scheme` header, and `users` has no organization link. So a valid admin can obtain a token for any tenant. Fixing that means a `users.organization_id` migration and a login change, which affects every existing account, so I documented it rather than changing auth unilaterally.
 
 ---
 
@@ -163,8 +168,9 @@ In short: depth on the backend because that is where the product was broken and 
 4. **Idempotency, Partial Writes & Concurrent Retries**:
    - Regenerating a portfolio replaces its skills; it never adds a second set.
    - The delete-and-rebuild runs inside a savepoint transaction with a row lock on the portfolio. If any skill row fails mid-write, the previous skills are kept and the portfolio is marked `failed` with the error. Two regenerations for the same portfolio wait for each other instead of interleaving.
-5. **Network / Audio Silence Handling**:
-   - The silence pump sends synthetic silent PCM frames every 30 ms during pauses so Gemini's VAD detects the end of the candidate's turn instead of hanging.
+5. **Live Interview Connects and Turn Detection Keeps Working**:
+   - The Live session must reach `setupComplete` on the current API: `v1alpha` endpoint, model name from `GEMINI_LIVE_MODEL` (so a deprecation is a config change), auth via the `x-goog-api-key` header only (never in the URL).
+   - Turn detection during silence relies on the **existing** silence pump (synthetic silent PCM frames every 30 ms). That code was already upstream and I kept it unchanged; my change was making the Live session it depends on connect at all (GAP-01).
 
 #### Acceptance Criteria → Code → Test Traceability
 
@@ -172,9 +178,9 @@ In short: depth on the backend because that is where the product was broken and 
 | :--- | :--- | :--- |
 | 1. Unassessed skills | `api/app/services/fit_gap/engine.rb` (`build_skill_comparisons`, `generate_fallback_narrative`); `web/src/components/fitgap/ComparisonTable.tsx` | `spec/services/fit_gap/engine_spec.rb`: "safely evaluates delta without crashing on unassessed skills…", "reports unassessed skills separately instead of counting them as gaps"; `spec/services/portfolios/generator_spec.rb`: "…preserves nil for unassessed skills" |
 | 2. Code fence parsing | `api/app/services/portfolios/generator.rb#parse_json_response` | `generator_spec.rb`: "successfully parses markdown-fenced JSON…"; `engine_spec.rb` (fenced narrative) |
-| 3. Assessor overrides | `api/app/controllers/api/v1/portfolio_skills_controller.rb`, `FitGap::Engine#effective_portfolio_skills` | `engine_spec.rb`: "uses the override level for the delta and flags the comparison" |
-| 4. Idempotency & partial writes | `api/app/services/portfolios/generator.rb#save_skills` | `generator_spec.rb`: "replaces skills instead of duplicating them on repeated runs", "keeps the previous skills when a skill row fails mid-write" |
-| 5. Silence handling | `api/app/clients/gemini/live_client.rb` (`SILENCE_PUMP_*`) | Verified manually in the live interview (see video); not covered by an automated test because it needs a live Gemini WebSocket. |
+| 3. Assessor overrides | `api/app/controllers/api/v1/portfolio_skills_controller.rb`, `FitGap::Engine#effective_portfolio_skills`, `Exports::PdfGenerator` | `engine_spec.rb`: "uses the override level for the delta and flags the comparison"; `pdf_generator_spec.rb`: "exports an overridden skill and LLM text with arrows, emoji and CJK…"; `tenant_isolation_spec.rb`: "returns 404 and creates no override for another tenant's portfolio skill" |
+| 4. Idempotency & partial writes | `api/app/services/portfolios/generator.rb` (`call`, `save_skills`) | `generator_spec.rb`: "replaces skills instead of duplicating them on repeated runs", "keeps the previous skills when a skill row fails mid-write", "leaves the skills and the assessor's override untouched…" (re-run on a complete portfolio) |
+| 5. Live session connects | `api/app/clients/gemini/live_client.rb` (endpoint, model, header auth) | No automated test, because it needs a live Gemini WebSocket. Verified by a handshake probe (`setupComplete` with header-only auth, 24 Oct 2026) and in the video. |
 
 ---
 
@@ -218,9 +224,8 @@ A comprehensive RSpec test harness was written from scratch, validating all mode
 
 ```bash
 # api/ — bundle exec rspec (RAILS_ENV=test, PostgreSQL)
-Finished in 11.92 seconds (files took 30.33 seconds to load)
-29 examples, 0 failures
-Randomized with seed 35332
+Finished in 12.88 seconds (files took 24.76 seconds to load)
+34 examples, 0 failures   # also run 3x in random order, all green
 
 # web/ — npx vitest run
  ✓ src/utils/internetSpeedTest.test.ts (12 tests)
@@ -231,10 +236,11 @@ Randomized with seed 35332
 #### Test Suite Breakdown:
 | Spec | Examples | What it proves |
 | :--- | :---: | :--- |
-| `spec/services/portfolios/generator_spec.rb` | 4 | Markdown-fenced JSON parsing, `nil` level preserved for unassessed skills, model error marks portfolio `failed`, regeneration replaces skills instead of duplicating them, a failed skill row mid-write rolls back to the previous skill set. |
+| `spec/services/portfolios/generator_spec.rb` | 5 | Markdown-fenced JSON parsing, `nil` level preserved for unassessed skills, model error marks portfolio `failed`, regeneration replaces skills instead of duplicating them, a failed skill row mid-write rolls back to the previous skill set, a re-run job on a complete portfolio keeps the skills and the assessor's override. |
+| `spec/requests/api/v1/tenant_isolation_spec.rb` | 3 | An assessor of another organization gets 404 (and no data) on export, override and fit/gap read/regenerate; the owning tenant still gets 200. |
 | `spec/services/fit_gap/engine_spec.rb` | 4 | `match` / `exceed` / `not_assessed` statuses and deltas, unassessed skills reported separately (never as gaps), assessor override drives the delta and sets `is_override`, rule-based fallback when the narrative call fails. |
 | `spec/services/sessions/end_handler_spec.rb` | 2 | Ending a session records the duration and enqueues portfolio generation exactly once; an invalid end reason falls back to `manual_assessor`. |
-| `spec/services/exports/pdf_generator_spec.rb` | 2 | The Prawn dossier renders a valid binary PDF, with and without a vacancy attached. |
+| `spec/services/exports/pdf_generator_spec.rb` | 3 | The Prawn dossier renders a valid binary PDF, with and without a vacancy attached, and with an overridden skill plus LLM text containing arrows, emoji and CJK (previously a 500). |
 | `spec/requests/api/v1/sessions_spec.rb` | 4 | 422 with a clear error when an assessment has no skills; session creation generates an invite URL; the candidate endpoint works without auth and returns 404 for an invalid token. |
 | `spec/requests/api/v1/portfolios_spec.rb` | 3 | 202 while the portfolio is generating; structured skills when complete; assessor override with notes. |
 | `spec/requests/api/v1/fitgap_spec.rb` | 3 | Fit/Gap generation is enqueued when no report exists; portfolio export as JSON and as PDF. |
@@ -248,19 +254,21 @@ Randomized with seed 35332
 To prove that the test suite actively prevents regressions rather than acting as a superficial checklist, we conducted a **Seeded Fault Test**:
 
 1. **Injected Mutation**:
-   In `app/services/fit_gap/engine.rb`, we deliberately removed the `candidate_level.nil?` guard and reverted to raw subtraction:
+   In `app/services/fit_gap/engine.rb`, the null guard was removed so every skill goes through raw subtraction:
    ```ruby
    # MUTATION INJECTED:
-   delta = candidate_level - required_level
+   if true # was: if candidate_level.present?
+     delta = candidate_level - expected_level
    ```
-2. **Execution Result**:
-   Running `bundle exec rspec spec/services/fit_gap/engine_spec.rb` immediately failed with:
+2. **Execution Result** (re-run on 24 Oct 2026 for this revision; output copied verbatim):
+   Running `bundle exec rspec spec/services/fit_gap/engine_spec.rb` failed 3 examples:
    ```
-   Failures:
-     1) FitGap::Engine when candidate has an unassessed skill marks status as not_assessed
-        Failure/Error: delta = candidate_level - required_level
-        NoMethodError:
-          undefined method `-' for nil:NilClass
+   1) FitGap::Engine when Gemini returns narrative JSON safely evaluates delta without crashing on unassessed skills and records report
+      Failure/Error: delta  = candidate_level - expected_level
+      NoMethodError:
+        undefined method `-' for nil
+   2) FitGap::Engine when Gemini fails reports unassessed skills separately instead of counting them as gaps
+   3) FitGap::Engine when Gemini fails falls back gracefully to rule-based summary without crashing
    ```
 3. **Restoration**:
    Restored the null-safe branch (`if candidate_level.present?` … `else delta = nil; result = 'not_assessed'`). The suite returned to green.
@@ -270,6 +278,11 @@ To prove that the test suite actively prevents regressions rather than acting as
 2. **Result**: `12 examples, 2 failures`, including "keeps the previous skills when a skill row fails mid-write". The old skill set was gone and only half of the new set had been written.
 3. **What the test also caught**: the first version of the fix (transaction + row lock) still failed the same spec. The cause was that after the rollback, the in-memory association still held the rolled-back skill, and `portfolio.update!(generation_status: 'failed')` autosaved it back to the database. The fix reloads the portfolio before marking it failed. Without this spec, that bug would have shipped.
 4. **After the fix**: `29 examples, 0 failures`.
+
+#### Third Seeded Fault (Revision): Security and Data-Loss Audit
+1. **Fault**: five new specs were committed *before* their fixes (commit `5cb182c` in the PR history): three cross-tenant request specs, the PDF export with an overridden skill, and a re-run job on a complete portfolio.
+2. **Result against the old code**: `34 examples, 5 failures`. Another tenant's portfolio was exported, overridden, and its fit/gap report destroyed. The PDF export raised `Prawn::Errors::IncompatibleStringEncoding`. The re-run job wiped the assessor's override.
+3. **After the fixes**: `34 examples, 0 failures`.
 
 ---
 
@@ -296,15 +309,38 @@ GEMINI_LIVE_MODEL = 'gemini-2.0-flash-exp'
 ### Protected Data & Indonesian UU PDP Compliance
 
 In accordance with **Indonesia's Personal Data Protection Law (UU PDP No. 27/2022)**:
-1. **Parameter Filtering**: Configured `config/initializers/filter_parameter_logging.rb` to mask sensitive candidate data:
+1. **Parameter Filtering**: `config/initializers/filter_parameter_logging.rb` masks credentials and candidate data in request logs (Rails matches these as substrings, so `:token` also covers `invite_token` and `:email` covers `candidate_email`):
    ```ruby
    Rails.application.config.filter_parameters += [
-     :password, :secret, :token, :_key, :crypt, :salt, :certificate, :otp, :ssn,
-     :invite_token, :evidence, :transcript, :audio_data, :candidate_name, :candidate_email
+     :passw, :secret, :token, :_key, :crypt, :salt, :certificate, :otp, :ssn,
+     :candidate_name, :email, :phone, :phone_number, :nik, :audio_data,
+     :transcript, :evidence, :assessor_notes
    ]
    ```
-2. **Reversible Migrations**: All database migrations implement explicit `up` and `down` methods with reversible column drops and foreign key constraints.
-3. **Data Minimization**: Audio buffers are processed as transient memory streams and discarded immediately after transcription.
+2. **No Transcript Text in Application Logs**: the Gemini Live client logs the *length* of each transcription event, not its content.
+3. **Tenant Isolation**: portfolios, skills, overrides and fit/gap reports are only reachable through the requesting organization's sessions (see the constraint signal in Step 3 and `tenant_isolation_spec.rb`).
+4. **No Secrets or Personal Data in the Repository**: the Gemini key is sent only in the `x-goog-api-key` header, never in a URL that proxies or APM tools could log. Redis/Postgres passwords are no longer hardcoded as fallbacks: production fails at boot if `REDIS_URI` is missing, and docker compose reads them from a gitignored `.env`. Seeds create one admin from `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` instead of fixed accounts.
+5. **Migration Safety**: the only migration in this PR (`allow_null_ai_level_for_portfolio_skills`) relaxes constraints, so it is safe on existing rows. Its rollback refuses to run, with a clear message, once unassessed (NULL) rows exist, instead of failing halfway.
+6. **Data Minimization**: this service does not persist raw audio. Audio frames are relayed to Gemini Live and only the transcript text is stored. Retention on Google's side is governed by the Gemini API terms, not by this codebase.
+
+---
+
+### Known Limitations (Not Fixed in This PR)
+
+These came out of the worst-case review. They need either a product decision or more time than this revision allowed, so I document them instead of claiming the flow is fully resilient.
+
+| Area | What can go wrong | Impact | Proposed fix |
+| :--- | :--- | :--- | :--- |
+| Auth / tenancy | Login issues a token for whatever `X-Tenant-Scheme` the client sends (upstream code). | A valid admin can act in another tenant's scope for tenant-scoped models. | `users.organization_id`, derive scheme from the user, reject a mismatched header. |
+| Live interview | The candidate reconnects within the 120 s grace window, but the old connection's timer still ends the session. | The interview is cut mid-answer after a refresh. | Per-session registry of live connections; the timer skips if another connection is active. |
+| Live interview | Gemini opens the socket but never sends `setupComplete`. | The candidate waits on "connecting" with no error. | Setup timeout (~10 s) leading into the existing reconnect path. |
+| Live interview | No EventMachine error handler; some EM callbacks touch the DB without rescue. | One unexpected exception can stop the reactor for that Puma worker. | `EM.error_handler` plus rescue in the callbacks. |
+| Session lifecycle | Enqueue fails (Redis down) or the worker is killed mid-job. | The portfolio stays `pending`/`generating` and the UI spinner never ends. | Mark `failed` on enqueue error; a stale-job reaper; allow regenerate on stale `generating`. |
+| Fit/Gap UI | Polling re-triggers generation on every 404. | Repeated jobs and Gemini calls while a report is generating or failing. | Trigger once, poll with GET only, and persist a failed state. |
+| Candidate UI | Several error paths (bad token, Gemini failure, mic error) show the "interview complete" screen. | The candidate is told their answers were saved when they may not have been. | Map `session_ended.reason` and errors to honest states. |
+| Overrides | `assessor_overrides.ai_level` is NOT NULL. | An assessor cannot set a level for an unassessed skill. | Allow NULL `ai_level` in overrides (migration + validation). |
+| Infrastructure | CORS defaults to `*` when `ALLOWED_ORIGINS` is unset; the speed-test upload cap trusts `Content-Length`. | Misconfiguration risk in production; the upload body limit is bypassable. | Require `ALLOWED_ORIGINS` in production; enforce the body size at Puma/proxy. |
+| Delivery | No CI pipeline. | Tests are only enforced when someone runs them. | GitHub Actions with Postgres + Redis services running RSpec and Vitest. |
 
 ---
 
@@ -315,7 +351,7 @@ In accordance with **Indonesia's Personal Data Protection Law (UU PDP No. 27/202
 - **Base**: `rakamindev/ai-interview-platform` → `main`
 - **Head**: `akmalgsyk25/monozukuri` → `monozukuri`
 - **PR Title**: `feat: fullstack revamp of interview, portfolio evidence and Fit/Gap (api + web + tests)`
-- **Scope**: backend (`api/`: services, controllers, migrations, workers), frontend (`web/`: interview room, hardware check, portfolio, Fit/Gap, override UI) and tests (`api/spec`: 29 RSpec examples; `web/`: 12 Vitest tests). The PR description maps each of the five acceptance criteria to its code and specs.
+- **Scope**: backend (`api/`: services, controllers, migrations, workers), frontend (`web/`: interview room, hardware check, portfolio, Fit/Gap, override UI) and tests (`api/spec`: 34 RSpec examples; `web/`: 12 Vitest tests). The PR description maps each of the five acceptance criteria to its code and specs.
 
 ---
 
@@ -333,7 +369,7 @@ In accordance with **Indonesia's Personal Data Protection Law (UU PDP No. 27/202
 | **00:45 – 01:45** | **Live Candidate Interview Flow** | Showcase candidate invite onboarding, hardware check, live audio conversation with AI, and dynamic waveform visualizer. |
 | **01:45 – 02:45** | **Portfolio Generation & Evidence Audit** | Showcase post-interview evaluation: Extracted competency cards, L1–L5 level anchors, and verbatim quotes from candidate Kagama. |
 | **02:45 – 03:45** | **Fit/Gap Intelligence & PDF Export** | Demonstrate vacancy matching, radar visualization, assessor score overrides, and instant executive PDF download. |
-| **03:45 – 04:30** | **Engineering Rigor & Data Safety** | Highlight 18 RSpec test cases, Seeded Fault verification, UU PDP log masking, and clean production build. |
+| **03:45 – 04:30** | **Engineering Rigor & Data Safety** | Highlight 18 RSpec test cases (recorded for the August submission; the suite is now 34), Seeded Fault verification, UU PDP log masking, and clean production build. |
 
 ---
 
