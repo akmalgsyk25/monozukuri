@@ -18,5 +18,8 @@ Rails.application.config.filter_parameters += [
   :phone,
   :phone_number,
   :nik,
-  :audio_data
+  :audio_data,
+  :transcript,
+  :evidence,
+  :assessor_notes
 ]
