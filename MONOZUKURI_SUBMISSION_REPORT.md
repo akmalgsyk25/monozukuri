@@ -5,7 +5,15 @@
 **Repository:** [akmalgsyk25/monozukuri: Quality Engineer case study: a two-service platform (api + web) that candidates assess, harden, and release.](https://github.com/akmalgsyk25/monozukuri)  
 **Target Upstream:** `github.com/rakamindev/ai-interview-platform`  
 **Feature Branch:** `monozukuri`  
-**Submission Date:** 24 August 2026  
+**Pull Request:** <!-- PR_URL --> `https://github.com/rakamindev/ai-interview-platform/pull/<number>` (base: `main`)  
+**Submission Date:** 24 August 2026 · **Revised:** 25 October 2026  
+
+> **Revision notes (October 2026), responding to reviewer feedback:**
+> 1. The open Pull Request to `rakamindev/ai-interview-platform` → `main` is linked above and in Step 6.
+> 2. The PR covers backend (`api/`), frontend (`web/`) and tests (RSpec + Vitest). Each of the five acceptance criteria is mapped to its code and tests in the traceability table in Step 4. AC 1 and AC 4 were re-checked against the code: AC 1's wording was corrected (unassessed skills have `delta = nil`, not `0`), and AC 4 now has the transaction and row lock it described, plus two new regression specs.
+> 3. A new section, *Engineering Focus: Backend-Weighted*, explains why the solution leans on the backend.
+> 4. The Options Matrix now separates **Failure Modes** (what breaks) from **Mitigation** (how the selected option handles it).
+> 5. The generic rejection reason was replaced with the specific product, deadline, latency and ownership constraints behind rejecting Options A and C.
 
 ---
 
@@ -17,7 +25,7 @@ This document presents the end-to-end product transformation and engineering rev
 1. **Zero-Friction Live AI Interview**: Upgraded to Google Gemini Multimodal Live WebSocket API (`v1alpha` on `gemini-2.5-flash-native-audio-latest`) with interactive audio waveform visualization, silence-pump VAD detection, and resilient hardware checks.
 2. **Evidence-Grounded Skill Portfolio**: Post-interview evaluation engine utilizing `gemini-3.1-pro-preview` with markdown-fence resilient JSON parsing, extracting exact verbatim quotes from candidates to prevent AI hallucinations.
 3. **Null-Safe Fit/Gap Intelligence Engine**: Comprehensive role-matching engine supporting multi-level behavioral anchors (L1–L5), explicit handling of unassessed skills, assessor override workflows, and instant offline executive PDF dossier generation via Prawn.
-4. **100% Verified Test Harness**: Built a complete RSpec test suite (**18 examples, 0 failures**) covering failure paths, concurrency idempotency, and edge-case data safety.
+4. **Verified Test Harness**: Built an RSpec suite from zero (**29 examples, 0 failures**) and added a Vitest runner to the web app (**12 tests, 0 failures**), covering failure paths, partial-write rollback, regeneration idempotency, and edge-case data safety.
 
 ---
 
@@ -113,27 +121,60 @@ graph TD
     C2 --> C3[Extreme Complexity, High Ops Overhead]
 ```
 
-| Evaluation Dimension | Option A: Ad-Hoc Hotfixing | Option B: Monozukuri Fullstack Revamp (Selected) | Option C: Python Microservices Extraction |
+| Evaluation Dimension | Option A: Ad-Hoc Hotfixing | Option B: Fullstack Revamp inside the existing Rails + React monorepo (Selected) | Option C: Python Microservices Extraction |
 | :--- | :--- | :--- | :--- |
-| **Product Impact** | Low. Fixes connection but leaves scoring brittle and un-auditable. | **Maximum**. Transforms entire pipeline into a resilient, evidence-backed dossier. | Moderate. Improves AI processing but introduces network hops and latency. |
-| **Engineering Cost** | 1 day. | **3 days**. | 2+ weeks (Requires separate deployment pipelines). |
-| **Maintainability** | Poor. Tech debt remains in Rails and React codebases. | **High**. Idiomatic Rails services, clean TypeScript interfaces, 100% test coverage. | Complex. Distributed tracing and dual-stack maintenance required. |
-| **Failure Modes** | Silent failures on unassessed skills and malformed JSON. | Explicit failure states, graceful UI fallback, and retry queues. | Distributed network timeouts and sync issues. |
-| **Contextual Fit** | Unacceptable for Monozukuri standards. | **Optimal**. Delivers top-notch UX and uncompromised system rigor. | Over-engineered for current organizational stage. |
+| **Product Impact** | Low. Restores the voice connection, but scores stay un-auditable and unassessed skills still look like failures to the recruiter. | **High**. Every score is tied to verbatim evidence, assessors can override it with an audit trail, and Fit/Gap distinguishes "gap" from "not assessed". | Moderate. Same evaluation quality as B, but adds a network hop between Rails and the evaluator. |
+| **Engineering Cost** | ~1 day. | **~3 days**. | 2+ weeks (new service, deployment pipeline, auth between services). |
+| **Maintainability** | Poor. Fixes land without specs, so the next change can silently reintroduce them. | **High**. Stays in the stack the team already runs (Rails services + Sidekiq + React), covered by RSpec and Vitest; each service object can be reverted independently. | Low for this team. Two languages, two deploy targets, distributed tracing needed to debug one interview. |
+| **Failure Modes** (what breaks it) | (1) `nil` skill level crashes Fit/Gap with `NoMethodError`. (2) LLM wraps JSON in a markdown fence and the parser raises. (3) A retried job writes a second set of skills. (4) Nothing alerts anyone, because none of these paths are tested. | (1) Gemini Live drops mid-interview (network loss, server-side close, model deprecated as happened in GAP-04). (2) The evaluator returns malformed or partial JSON, or a skill row fails validation halfway through the write. (3) Two regenerations for the same portfolio run at the same time. (4) The Sidekiq queue backs up or Gemini rate-limits, so portfolios stay in `generating`. (5) The narrative call to Gemini Flash times out. | (1) Network timeout between Rails and the Python service leaves a session ended but never evaluated. (2) Schema drift between the two services' payload contracts. (3) Partial failure where one service deploys and the other does not. |
+| **Mitigation** | None by design; this option accepts the risk. | (1) Reconnect on inactivity timeout, keepalive timers, model name read from ENV so a deprecation is a config change. (2) Fence-tolerant parser; skill writes run inside a savepoint so a failed row rolls back to the previous skill set (spec-covered). (3) Row lock (`SELECT … FOR UPDATE`) on the portfolio serializes regenerations. (4) Sidekiq `retry: 3` with `sidekiq_retries_exhausted` marking the portfolio `failed` and surfacing the error in the UI with a regenerate button. (5) Rule-based fallback narrative that still reports matches, gaps and unassessed skills. | Retries with idempotency keys, contract tests, coordinated deploys; all add work beyond this deadline. |
+| **Contextual Fit** | Rejected (see below). | **Selected**. Fixes the P0/P1 defects where they live, inside the codebase and infrastructure the team already operates. | Rejected (see below). |
+
+### Why the Alternatives Were Rejected
+
+**Option A (Ad-Hoc Hotfixing) — rejected for a product reason and an engineering reason.**
+- *Product constraint:* the output of this platform decides whether a candidate moves forward. A hotfix that stops the crash but still renders an unassessed skill like a weak one (or drops it silently) can lower a real candidate's result for a skill nobody asked about. Assessors would also still have no way to correct the AI (GAP-07 stays open), so recruiters keep re-checking every score by hand, which is the work the product is supposed to remove.
+- *Engineering constraint:* the brief states the repository starts with no RSpec specs and no web test runner. Hotfixes without a harness cannot prove a regression is caught, and "changes tested only on the happy path" is an explicit disqualifier. One day saved now is paid back the first time GAP-05 or GAP-06 returns unnoticed.
+
+**Option C (Python Microservices Extraction) — rejected on cost, latency, and ownership.**
+- *Deadline constraint:* a second service needs its own deployment pipeline, service-to-service auth, and contract tests: at least two weeks against a three-day window.
+- *Latency constraint:* the live interview is a real-time audio loop. Adding a network hop on the evaluation path adds another timeout and partial-failure case (session ended, never evaluated) without improving the evaluation itself, since the model call is the same either way.
+- *Ownership constraint:* the team already runs Rails, Sidekiq, PostgreSQL and Redis. A Python service means a second language to hire for, monitor and patch, and it is expensive to walk back once data flows through it. Nothing in the current problem needs Python-only tooling.
+
+### Engineering Focus: Backend-Weighted, with a Complete Frontend Slice
+
+The solution is **primarily backend-focused**. Reasons:
+1. **Where the defects were.** Of the eight findings, the blocking ones (GAP-01 WebSocket endpoint, GAP-03 invite URL, GAP-04 model and parser, GAP-05 `nil` arithmetic, GAP-06 duplicate skills) all sit in `api/`. The frontend could not show a correct result while the API produced a crash or duplicated rows.
+2. **Where correctness must be guaranteed.** Scores, evidence, overrides and the audit trail affect a candidate's hiring outcome. They have to be computed and persisted correctly on the server, under retries and concurrent jobs, regardless of which client calls the API. That is why the test suite is weighted to RSpec (service and request specs).
+3. **What the frontend does.** The frontend presents the states the backend now defines explicitly: the neutral "Belum Diuji / not assessed" badge instead of a gap, the generating/failed/regenerate states of the portfolio, the assessor override flow, and the candidate pre-flight check (microphone VU meter and a speed test that goes through our own API instead of CORS-blocked third-party endpoints, covered by 12 Vitest tests).
+
+In short: depth on the backend because that is where the product was broken and where trust is decided; the frontend is complete for every state the backend can return, but it is not where most of the engineering risk was.
 
 ### Self-Derived Acceptance Criteria & Edge-Case Handling Matrix
 
-1. **Unassessed Skills (`ai_level == nil`)**:
+1. **Unassessed Skills (`ai_level == nil` or skill missing from the portfolio)**:
    - Must NOT crash Fit/Gap calculations.
-   - Status marked explicitly as `not_assessed` with a dedicated neutral badge and `gap = 0`.
+   - The comparison is marked `not_assessed` with `candidate_level = nil` and `delta = nil` (not `0`, because `0` would mean "meets the bar"). It is never counted as a gap.
+   - The UI shows a neutral "Belum Diuji" badge, and the fallback narrative reports unassessed skills separately ("N required skill(s) were not assessed … need follow-up").
 2. **Markdown Code Fence in LLM Output**:
-   - Resilient parser strips markdown code fences (e.g. ```` ```json ````) and extracts pure JSON payload seamlessly.
+   - The parser strips markdown code fences (e.g. ```` ```json ````) and surrounding prose, and extracts the JSON payload.
 3. **Assessor Overrides**:
-   - Updating a skill level automatically recalculates Fit/Gap deltas and updates the audit trail (`overridden_by`, `overridden_at`, `assessor_notes`).
-4. **Idempotency & Concurrent Retries**:
-   - Destroy and rebuild portfolio skills inside an `ActiveRecord::Base.transaction` block to guarantee zero duplicate records.
+   - An override replaces the AI level in Fit/Gap (delta and status are recalculated from the override level), the comparison is flagged `is_override`, and the audit trail is stored (`overridden_by`, `overridden_at`, `assessor_notes`).
+4. **Idempotency, Partial Writes & Concurrent Retries**:
+   - Regenerating a portfolio replaces its skills; it never adds a second set.
+   - The delete-and-rebuild runs inside a savepoint transaction with a row lock on the portfolio. If any skill row fails mid-write, the previous skills are kept and the portfolio is marked `failed` with the error. Two regenerations for the same portfolio wait for each other instead of interleaving.
 5. **Network / Audio Silence Handling**:
-   - Silence pump injects synthetic 0x00 PCM frames every 30ms during pauses so Gemini VAD cleanly marks turn completions without hanging.
+   - The silence pump sends synthetic silent PCM frames every 30 ms during pauses so Gemini's VAD detects the end of the candidate's turn instead of hanging.
+
+#### Acceptance Criteria → Code → Test Traceability
+
+| AC | Implementation | Test |
+| :--- | :--- | :--- |
+| 1. Unassessed skills | `api/app/services/fit_gap/engine.rb` (`build_skill_comparisons`, `generate_fallback_narrative`); `web/src/components/fitgap/ComparisonTable.tsx` | `spec/services/fit_gap/engine_spec.rb`: "safely evaluates delta without crashing on unassessed skills…", "reports unassessed skills separately instead of counting them as gaps"; `spec/services/portfolios/generator_spec.rb`: "…preserves nil for unassessed skills" |
+| 2. Code fence parsing | `api/app/services/portfolios/generator.rb#parse_json_response` | `generator_spec.rb`: "successfully parses markdown-fenced JSON…"; `engine_spec.rb` (fenced narrative) |
+| 3. Assessor overrides | `api/app/controllers/api/v1/portfolio_skills_controller.rb`, `FitGap::Engine#effective_portfolio_skills` | `engine_spec.rb`: "uses the override level for the delta and flags the comparison" |
+| 4. Idempotency & partial writes | `api/app/services/portfolios/generator.rb#save_skills` | `generator_spec.rb`: "replaces skills instead of duplicating them on repeated runs", "keeps the previous skills when a skill row fails mid-write" |
+| 5. Silence handling | `api/app/clients/gemini/live_client.rb` (`SILENCE_PUMP_*`) | Verified manually in the live interview (see video); not covered by an automated test because it needs a live Gemini WebSocket. |
 
 ---
 
@@ -176,18 +217,29 @@ sequenceDiagram
 A comprehensive RSpec test harness was written from scratch, validating all models, services, and failure paths:
 
 ```bash
-Finished in 7.08 seconds (files took 13.54 seconds to load)
-18 examples, 0 failures
+# api/ — bundle exec rspec (RAILS_ENV=test, PostgreSQL)
+Finished in 11.92 seconds (files took 30.33 seconds to load)
+29 examples, 0 failures
+Randomized with seed 35332
 
-Randomized with seed 16362
+# web/ — npx vitest run
+ ✓ src/utils/internetSpeedTest.test.ts (12 tests)
+ Test Files  1 passed (1)
+      Tests  12 passed (12)
 ```
 
 #### Test Suite Breakdown:
-- `spec/models/session_spec.rb`: Validates state transitions, invite tokens, candidate association, and invite URL normalization.
-- `spec/services/portfolios/generator_spec.rb`: Tests JSON parsing resilience, markdown fence stripping, unassessed skill level safety, and transaction idempotency.
-- `spec/services/fit_gap/engine_spec.rb`: Tests exact delta calculations across all four match statuses (`match`, `exceed`, `gap`, `not_assessed`), assessor override precedence, and culture fit narrative generation.
-- `spec/services/exports/pdf_generator_spec.rb`: Validates Prawn document structure, metadata generation, and byte stream integrity.
-- `spec/requests/api/v1/portfolios_spec.rb`: Validates token authorization, 422 guards on incomplete exports, and Sidekiq background job queueing.
+| Spec | Examples | What it proves |
+| :--- | :---: | :--- |
+| `spec/services/portfolios/generator_spec.rb` | 4 | Markdown-fenced JSON parsing, `nil` level preserved for unassessed skills, model error marks portfolio `failed`, regeneration replaces skills instead of duplicating them, a failed skill row mid-write rolls back to the previous skill set. |
+| `spec/services/fit_gap/engine_spec.rb` | 4 | `match` / `exceed` / `not_assessed` statuses and deltas, unassessed skills reported separately (never as gaps), assessor override drives the delta and sets `is_override`, rule-based fallback when the narrative call fails. |
+| `spec/services/sessions/end_handler_spec.rb` | 2 | Ending a session records the duration and enqueues portfolio generation exactly once; an invalid end reason falls back to `manual_assessor`. |
+| `spec/services/exports/pdf_generator_spec.rb` | 2 | The Prawn dossier renders a valid binary PDF, with and without a vacancy attached. |
+| `spec/requests/api/v1/sessions_spec.rb` | 4 | 422 with a clear error when an assessment has no skills; session creation generates an invite URL; the candidate endpoint works without auth and returns 404 for an invalid token. |
+| `spec/requests/api/v1/portfolios_spec.rb` | 3 | 202 while the portfolio is generating; structured skills when complete; assessor override with notes. |
+| `spec/requests/api/v1/fitgap_spec.rb` | 3 | Fit/Gap generation is enqueued when no report exists; portfolio export as JSON and as PDF. |
+| `spec/requests/api/v1/speed_tests_spec.rb` | 7 | Same-origin speed test endpoint for the candidate pre-flight check (replaces CORS-blocked third-party endpoints): exact byte count, no caching, incompressible payload, size caps on download and upload. |
+| `web/src/utils/internetSpeedTest.test.ts` | 12 | Frontend speed test: pass/fail on upload, download and latency thresholds; unreachable server, request and probe timeouts; short responses not inflating the speed; rate-limit message; warm-up ping ignored; probes run sequentially. |
 
 ---
 
@@ -211,7 +263,13 @@ To prove that the test suite actively prevents regressions rather than acting as
           undefined method `-' for nil:NilClass
    ```
 3. **Restoration**:
-   Restored the defensive null-safe calculation `delta = candidate_level ? (candidate_level - required_level) : nil`. The test suite returned to 100% green (**18 passing**), proving the harness catches critical runtime flaws.
+   Restored the null-safe branch (`if candidate_level.present?` … `else delta = nil; result = 'not_assessed'`). The suite returned to green.
+
+#### Second Seeded Fault (Revision): Partial Write During Regeneration
+1. **Fault**: the specs for AC 4 were committed *before* the fix (see the PR's commit history), then run against the old `save_skills`, which deleted the old skills and inserted new ones without a transaction.
+2. **Result**: `12 examples, 2 failures`, including "keeps the previous skills when a skill row fails mid-write". The old skill set was gone and only half of the new set had been written.
+3. **What the test also caught**: the first version of the fix (transaction + row lock) still failed the same spec. The cause was that after the rollback, the in-memory association still held the rolled-back skill, and `portfolio.update!(generation_status: 'failed')` autosaved it back to the database. The fix reloads the portfolio before marking it failed. Without this spec, that bug would have shipped.
+4. **After the fix**: `29 examples, 0 failures`.
 
 ---
 
@@ -252,14 +310,12 @@ In accordance with **Indonesia's Personal Data Protection Law (UU PDP No. 27/202
 
 ## Step 6: Submission Deliverables & Video Walkthrough Guide
 
-### 1. GitHub Pull Request Details
-- **Fork Repository**: `https://github.com/akmalgsyk25/monozukuri`
-- **Upstream Repository**: `https://github.com/rakamindev/ai-interview-platform`
-- **Active Feature Branch**: `monozukuri`
-- **Target Branch**: `main`
-- **Pull Request Creation Link**: [Create PR on GitHub](https://github.com/akmalgsyk25/monozukuri/pull/new/monozukuri)
-- **PR Title**: `feat(monozukuri): End-to-End AI Talent Intelligence Platform Revamp`
-- **PR Description**: Full architectural summary, screenshots, test execution logs, and trade-off rationales.
+### 1. GitHub Pull Request (Option A: single comprehensive PR)
+- **Pull Request URL**: <!-- PR_URL --> `https://github.com/rakamindev/ai-interview-platform/pull/<number>`
+- **Base**: `rakamindev/ai-interview-platform` → `main`
+- **Head**: `akmalgsyk25/monozukuri` → `monozukuri`
+- **PR Title**: `feat: fullstack revamp of interview, portfolio evidence and Fit/Gap (api + web + tests)`
+- **Scope**: backend (`api/`: services, controllers, migrations, workers), frontend (`web/`: interview room, hardware check, portfolio, Fit/Gap, override UI) and tests (`api/spec`: 29 RSpec examples; `web/`: 12 Vitest tests). The PR description maps each of the five acceptance criteria to its code and specs.
 
 ---
 
