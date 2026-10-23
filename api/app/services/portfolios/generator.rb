@@ -31,7 +31,9 @@ module Portfolios
       Rails.logger.info("[N10] Portfolio generated for session #{@session.id}")
       portfolio
     rescue => e
-      portfolio&.update!(generation_status: 'failed', generation_error: e.message)
+      # Reload first: after a rolled-back skill write the in-memory association still holds
+      # those records, and saving the stale portfolio would autosave them back.
+      portfolio&.reload&.update!(generation_status: 'failed', generation_error: e.message)
       Rails.logger.error("[N10] Portfolio generation failed for session #{@session.id}: #{e.class} #{e.message}")
       raise
     end
@@ -150,9 +152,17 @@ module Portfolios
     def save_skills(portfolio, response)
       data = parse_json_response(response)
 
-      # Destroy existing skills (idempotent regeneration)
-      portfolio.portfolio_skills.destroy_all
+      # Idempotent regeneration: the row lock serializes concurrent jobs for the
+      # same portfolio, and requires_new gives a real rollback point so a failed
+      # insert restores the previous skills instead of leaving a partial set.
+      Portfolio.transaction(requires_new: true) do
+        portfolio.lock!
+        portfolio.portfolio_skills.destroy_all
+        create_skills(portfolio, data)
+      end
+    end
 
+    def create_skills(portfolio, data)
       (data['configured_skills'] || []).each do |skill_data|
         level = parse_skill_level(skill_data['level'])
 

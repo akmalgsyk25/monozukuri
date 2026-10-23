@@ -11,7 +11,12 @@ module Api
       # GET /api/v1/sessions/:id/portfolio
       def show
         if (@portfolio.nil? || @portfolio.pending?) && Rails.env.development? && @session&.transcript_turns&.exists?
-          Portfolios::Generator.new(session: @session).call rescue nil
+          begin
+            Portfolios::Generator.new(session: @session).call
+          rescue StandardError => e
+            # The generator has already marked the portfolio failed; the failed branch below returns that state.
+            Rails.logger.warn("[N10] Inline dev generation failed for session #{@session.id}: #{e.class}")
+          end
           @portfolio = @session.reload.portfolio
         end
 
